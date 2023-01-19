@@ -65,7 +65,7 @@
                 = new HttpRequestMessage
                   {
                       Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url)),
+                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
                       Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
 
@@ -81,7 +81,7 @@
                 = new HttpRequestMessage
                   {
                       Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url)),
+                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
                       Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
 

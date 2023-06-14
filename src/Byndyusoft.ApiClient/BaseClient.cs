@@ -47,7 +47,10 @@
 
         protected Task<TResult> PutAsync<TResult>(string url, object content) =>
             CallAsync<TResult>(HttpMethod.Put, url, content);
-
+        
+        protected Task<TResult> PatchAsync<TResult>(string url, object content) =>
+            CallAsync<TResult>(HttpMethod.Patch, url, content);
+        
         protected Task DeleteAsync(string url) =>
             CallAsync(HttpMethod.Delete, url, null);
 

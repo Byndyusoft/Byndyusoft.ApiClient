@@ -14,7 +14,7 @@ dotnet add package Byndyusoft.ApiClient
 
 ## Usage
 To create an API client:
-1. Create a class for your API client and make it derived from BaseClient:
+1. Create a class for your API client and declare it as derived from BaseClient:
 ```
 public class SomeApiClient : BaseClient
 {
@@ -34,7 +34,7 @@ public Task Delete(int id)
 public Task<Model> Get(GetModelRequest getModelRequest) =>
 	=> GetAsync<GetModelRequest, Model>("api/get, getModelRequest);
 ```
-3.  Make sure to include your client wherever you need to use it:
+3.  Make sure to register your client wherever you need to use it:
 ```
 serviceCollection.AddHttpClient<SomeApiClient>();
 ```

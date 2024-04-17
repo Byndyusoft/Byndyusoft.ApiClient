@@ -35,7 +35,16 @@
 
             var response = await _client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException)
+            {
+                throw new Exception($"Error occurred on sending a request. " +
+                                    $"Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. " +
+                                    $"Message: {response.ReasonPhrase}");
+            }
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }

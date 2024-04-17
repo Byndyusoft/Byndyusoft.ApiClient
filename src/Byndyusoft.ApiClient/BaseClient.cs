@@ -37,6 +37,7 @@
 
             if (response.IsSuccessStatusCode == false)
             {
+                response.Content.Dispose();
                 throw new HttpRequestException("Error occurred on sending a request. " +
                                                $"Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. " +
                                                $"Message: {response.ReasonPhrase}");

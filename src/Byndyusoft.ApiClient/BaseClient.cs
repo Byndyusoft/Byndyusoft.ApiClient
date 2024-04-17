@@ -20,7 +20,8 @@
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
         {
             var response = await _client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            
+            EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -35,13 +36,7 @@
 
             var response = await _client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
 
-            if (response.IsSuccessStatusCode == false)
-            {
-                response.Content.Dispose();
-                throw new HttpRequestException("Error occurred on sending a request. " +
-                                               $"Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. " +
-                                               $"Message: {response.ReasonPhrase}");
-            }
+            EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -80,7 +75,8 @@
                   };
 
             var response = await _client.SendAsync(requestMessage, cancellationToken);
-            response.EnsureSuccessStatusCode();
+
+            EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -96,7 +92,19 @@
                   };
 
             var response = await _client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+
+            EnsureSuccessStatusCode(response);
+        }
+
+        private void EnsureSuccessStatusCode(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode == false)
+            {
+                response.Content.Dispose();
+                throw new HttpRequestException("Error occurred on sending a request. " +
+                                               $"Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. " +
+                                               $"Message: {response.ReasonPhrase}");
+            }
         }
     }
 }

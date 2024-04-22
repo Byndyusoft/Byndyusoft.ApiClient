@@ -21,7 +21,7 @@
         {
             var response = await _client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
             
-            EnsureSuccessStatusCode(response);
+            await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -36,7 +36,7 @@
 
             var response = await _client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
 
-            EnsureSuccessStatusCode(response);
+            await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -76,7 +76,7 @@
 
             var response = await _client.SendAsync(requestMessage, cancellationToken);
 
-            EnsureSuccessStatusCode(response);
+            await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -93,17 +93,20 @@
 
             var response = await _client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
 
-            EnsureSuccessStatusCode(response);
+            await EnsureSuccessStatusCode(response);
         }
 
-        private void EnsureSuccessStatusCode(HttpResponseMessage response)
+        private async Task EnsureSuccessStatusCode(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode == false)
             {
+                var stringContent = await response.Content.ReadAsStringAsync();
                 response.Content.Dispose();
-                throw new HttpRequestException("Error occurred on sending a request. " +
-                                               $"Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. " +
-                                               $"Message: {response.ReasonPhrase}");
+
+                throw new HttpRequestWithContentException(
+                    message: $"Error occurred on sending a request. Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. Message: {response.ReasonPhrase}",
+                    statusCode: response.StatusCode,
+                    content: stringContent);
             }
         }
     }

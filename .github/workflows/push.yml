@@ -16,7 +16,14 @@ jobs:
       DOTNET_NOLOGO: true
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        
+      - name: setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: | 
+            2.1.x
+            6.0.x
 
       - name: install packages
         run: dotnet restore

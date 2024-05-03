@@ -20,7 +20,8 @@
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
         {
             var response = await _client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            
+            await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -35,7 +36,7 @@
 
             var response = await _client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
 
-            response.EnsureSuccessStatusCode();
+            await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -74,7 +75,8 @@
                   };
 
             var response = await _client.SendAsync(requestMessage, cancellationToken);
-            response.EnsureSuccessStatusCode();
+
+            await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
@@ -90,7 +92,22 @@
                   };
 
             var response = await _client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+
+            await EnsureSuccessStatusCode(response);
+        }
+
+        private async Task EnsureSuccessStatusCode(HttpResponseMessage response)
+        {
+            if (response.IsSuccessStatusCode == false)
+            {
+                var stringContent = await response.Content.ReadAsStringAsync();
+                response.Content.Dispose();
+
+                throw new HttpRequestWithContentException(
+                    message: $"Error occurred on sending a request. Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. Message: {response.ReasonPhrase}",
+                    statusCode: response.StatusCode,
+                    content: stringContent);
+            }
         }
     }
 }

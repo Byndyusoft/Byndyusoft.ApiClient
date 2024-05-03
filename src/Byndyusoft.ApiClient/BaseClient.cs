@@ -1,6 +1,7 @@
 ﻿namespace Byndyusoft.ApiClient
 {
     using System;
+    using System.Collections.Generic;
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
@@ -26,7 +27,7 @@
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
 
-        protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
+        protected async Task<TResult> GetAsync<TParams, TResult>(string url, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default, TParams? dto = null)
             where TParams : class
         {
             var endpoint = GetAbsoluteUrl(url);
@@ -41,30 +42,30 @@
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
 
-        protected Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
-            CallAsync(HttpMethod.Post, url, content, cancellationToken);
+        protected Task PostAsync(string url, object content, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) =>
+            CallAsync(HttpMethod.Post, url, content, headers, cancellationToken);
 
-        protected Task<TResult> PostAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
-            CallAsync<TResult>(HttpMethod.Post, url, content, cancellationToken);
+        protected Task<TResult> PostAsync<TResult>(string url, object content, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) =>
+            CallAsync<TResult>(HttpMethod.Post, url, content, headers, cancellationToken);
 
-        protected Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
-            CallAsync<TResult>(HttpMethod.Put, url, content, cancellationToken);
+        protected Task<TResult> PutAsync<TResult>(string url, object content, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) =>
+            CallAsync<TResult>(HttpMethod.Put, url, content, headers, cancellationToken);
 
-        protected Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
-            CallAsync(new HttpMethod("PATCH"), url, content, cancellationToken);
+        protected Task PatchAsync(string url, object content, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) =>
+            CallAsync(new HttpMethod("PATCH"), url, content, headers, cancellationToken);
 
-        protected Task DeleteAsync(string url, CancellationToken cancellationToken) =>
-            CallAsync(HttpMethod.Delete, url, null, cancellationToken);
+        protected Task DeleteAsync(string url, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) =>
+            CallAsync(HttpMethod.Delete, url, null, headers, cancellationToken);
 
-        protected Task DeleteAsync<TParams>(string url, TParams parameters, CancellationToken cancellationToken) =>
-            CallAsync(HttpMethod.Delete, url, parameters, cancellationToken);
+        protected Task DeleteAsync<TParams>(string url, TParams parameters, Dictionary<string, string>? headers, CancellationToken cancellationToken) =>
+            CallAsync(HttpMethod.Delete, url, parameters, headers, cancellationToken);
 
         private string GetAbsoluteUrl(string url)
         {
             return $"{_apiSettings.ConnectionString}{url}";
         }
 
-        private async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        private async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, Dictionary<string, string>? headers, CancellationToken cancellationToken)
         {
             var requestMessage
                 = new HttpRequestMessage
@@ -73,6 +74,9 @@
                       RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
                       Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
+
+            if (headers != null) 
+                requestMessage.Headers.AddRange(headers);
 
             var response = await _client.SendAsync(requestMessage, cancellationToken);
 
@@ -81,7 +85,7 @@
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
 
-        private async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        private async Task CallAsync(HttpMethod method, string url, object? content, Dictionary<string, string>? headers, CancellationToken cancellationToken)
         {
             var requestMessage
                 = new HttpRequestMessage
@@ -90,6 +94,9 @@
                       RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
                       Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
+
+            if (headers != null)
+                requestMessage.Headers.AddRange(headers);
 
             var response = await _client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
 

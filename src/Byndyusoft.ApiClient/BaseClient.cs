@@ -8,18 +8,18 @@
 
     public class BaseClient
     {
-        private readonly ApiClientSettings _apiSettings;
-        private readonly HttpClient _client;
+        protected readonly ApiClientSettings ApiSettings;
+        protected readonly HttpClient Client;
 
         protected BaseClient(HttpClient client, IOptions<ApiClientSettings> apiSettings)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _apiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
+            Client = client ?? throw new ArgumentNullException(nameof(client));
+            ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
         }
 
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
         {
-            var response = await _client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
+            var response = await Client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
             
             await EnsureSuccessStatusCode(response);
 
@@ -34,7 +34,7 @@
                 ? $"{endpoint}?{HttpGetParamsBuilder.Build(dto)}"
                 : endpoint;
 
-            var response = await _client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
+            var response = await Client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
 
             await EnsureSuccessStatusCode(response);
 
@@ -59,12 +59,12 @@
         protected Task DeleteAsync<TParams>(string url, TParams parameters, CancellationToken cancellationToken) =>
             CallAsync(HttpMethod.Delete, url, parameters, cancellationToken);
 
-        private string GetAbsoluteUrl(string url)
+        protected string GetAbsoluteUrl(string url)
         {
-            return $"{_apiSettings.ConnectionString}{url}";
+            return $"{ApiSettings.ConnectionString}{url}";
         }
 
-        private async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
             var requestMessage
                 = new HttpRequestMessage
@@ -74,14 +74,14 @@
                       Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
 
-            var response = await _client.SendAsync(requestMessage, cancellationToken);
+            var response = await Client.SendAsync(requestMessage, cancellationToken);
 
             await EnsureSuccessStatusCode(response);
 
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
 
-        private async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
             var requestMessage
                 = new HttpRequestMessage
@@ -91,12 +91,12 @@
                       Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
 
-            var response = await _client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
+            var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
 
             await EnsureSuccessStatusCode(response);
         }
 
-        private async Task EnsureSuccessStatusCode(HttpResponseMessage response)
+        protected async Task EnsureSuccessStatusCode(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode == false)
             {

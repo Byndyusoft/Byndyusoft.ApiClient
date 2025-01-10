@@ -1,29 +1,41 @@
-﻿namespace Byndyusoft.ApiClient
+namespace Byndyusoft.ApiClient
 {
     using System;
     using System.Net.Http;
+    using System.Net.Http.Formatting;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Options;
 
-    public class BaseClient
+    public class FormatterClient:BaseClient
     {
-        protected readonly ApiClientSettings ApiSettings;
-        protected readonly HttpClient Client;
+        protected readonly MediaTypeFormatter Formatter;
 
-        protected BaseClient(HttpClient client, IOptions<ApiClientSettings> apiSettings)
+        protected FormatterClient
+        (
+            HttpClient client,
+            MediaTypeFormatter formatter,
+            IOptions<ApiClientSettings> apiSettings
+        ):base(client, apiSettings)
         {
-            Client = client ?? throw new ArgumentNullException(nameof(client));
-            ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
+            Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
         }
-
+        
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
         {
             var response = await Client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
-            
             await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            return await response
+                .Content
+                .ReadAsAsync<TResult>
+                    (
+                        new[]
+                        {
+                            Formatter
+                        },
+                        cancellationToken
+                    )
+                .ConfigureAwait(false);
         }
 
         protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
@@ -37,8 +49,17 @@
             var response = await Client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
 
             await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            return await response
+                .Content
+                .ReadAsAsync<TResult>
+                (
+                    new[]
+                    {
+                        Formatter
+                    },
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
         }
 
         protected Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
@@ -66,33 +87,42 @@
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var type = content.GetType();
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
                       RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
+                      Content = new ObjectContent(type, content, Formatter)
                   };
 
             var response = await Client.SendAsync(requestMessage, cancellationToken);
 
             await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            return await response
+                .Content
+                .ReadAsAsync<TResult>
+                (
+                    new[]
+                    {
+                        Formatter
+                    },
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
         }
 
         protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var type = content.GetType();
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
                       RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
+                      Content = new ObjectContent(type, content, Formatter)
                   };
-
             var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-
             await Toolkit.EnsureSuccessStatusCode(response);
         }
     }

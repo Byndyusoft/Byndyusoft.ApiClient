@@ -5,23 +5,23 @@ using Models;
 
 public class Controller
 {
-    [Controller]
+    [ApiController]
     [Route("protobuf-formatter")]
     public class ProtoBufFormatterController : ControllerBase
     {
-        [HttpPost]
+        [HttpPost("post")]
         public IActionResult Post([FromBody] SimpleType model)
         {
             return Ok(model);
         }
 
-        [HttpPut]
+        [HttpPut("put")]
         public IActionResult Put([FromBody] SimpleType model)
         {
             return Ok(model);
         }
 
-        [HttpGet]
+        [HttpGet("get")]
         public IActionResult Get()
         {
             return Ok(SimpleType.Create());

@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Functional;
+namespace Byndyusoft.ApiClient.Client;
 
 using System.Net.Http;
 using System.Net.Http.Formatting;

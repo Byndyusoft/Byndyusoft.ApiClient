@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Tests
+namespace Byndyusoft.ApiClient
 {
     using FluentAssertions;
     using Xunit;

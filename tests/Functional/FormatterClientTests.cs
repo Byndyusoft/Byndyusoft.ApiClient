@@ -1,6 +1,5 @@
 namespace Byndyusoft.ApiClient.Functional;
 
-using System.Net.Http.ProtoBuf;
 using System.Net.Http.ProtoBuf.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,24 +12,32 @@ using Xunit;
 public class FormatterClientTests: MvcTestFixture
 {
     private readonly TypeModel _typeModel;
-    private readonly TestFormatterClient TestSubject;
+    private readonly TestFormatterClient _testSubject;
     public FormatterClientTests()
     {
         _typeModel = RuntimeTypeModel.Default;
         var formatter = new ProtoBufMediaTypeFormatter(_typeModel);
-        TestSubject = new TestFormatterClient
+        _testSubject = new TestFormatterClient
             (
                 Client,
                 formatter,
                 new OptionsWrapper<ApiClientSettings>(
-                    new ApiClientSettings()
+                    new ApiClientSettings
+                    {
+                        ConnectionString = Client.BaseAddress.AbsoluteUri
+                    }
                 )
             );
     }
     protected override void ConfigureMvc(IMvcCoreBuilder builder)
     {
-        builder.AddProtoBufNet(
-            options => { options.Model = _typeModel; });
+        builder.AddProtoBufNet
+        (
+            options =>
+            {
+                options.Model = _typeModel;
+            }
+        );
     }
     
     [Fact]
@@ -41,7 +48,7 @@ public class FormatterClientTests: MvcTestFixture
         var cancel = CancellationToken.None;
 
         // Act
-        var result = await TestSubject.PostAsync<SimpleType>("/protobuf-formatter", input, cancel);
+        var result = await _testSubject.PostAsync<SimpleType>("protobuf-formatter/post", input, cancel);
 
         // Assert
         Assert.NotNull(result);

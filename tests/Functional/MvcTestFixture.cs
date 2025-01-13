@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Sockets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ public abstract class MvcTestFixture : IDisposable
     {
         private readonly string _url = $"http://localhost:{FreeTcpPort()}";
         private HttpClient? _client;
-        private IHost? _host;
+        protected IHost? _host;
 
         protected MvcTestFixture()
         {
@@ -40,17 +41,16 @@ public abstract class MvcTestFixture : IDisposable
                 {
                     _client = new HttpClient
                     {
-                        BaseAddress = new Uri(_url),
-                        DefaultRequestVersion = new Version(1, 0)
+                        BaseAddress = new Uri(_url)
                     };
                     ConfigureHttpClient(_client);
                 }
-
+    
                 return _client;
             }
         }
 
-        public virtual void Dispose()
+    public virtual void Dispose()
         {
             _host?.Dispose();
             _host = null;

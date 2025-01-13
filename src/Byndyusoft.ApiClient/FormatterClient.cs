@@ -23,19 +23,21 @@ namespace Byndyusoft.ApiClient
         
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
         {
-            var response = await Client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
+            var absoluteUrl = GetAbsoluteUrl(url);
+            var response = await Client.GetAsync(absoluteUrl, cancellationToken).ConfigureAwait(false);
             await Toolkit.EnsureSuccessStatusCode(response);
-            return await response
+            var result = await response
                 .Content
                 .ReadAsAsync<TResult>
-                    (
-                        new[]
-                        {
-                            Formatter
-                        },
-                        cancellationToken
-                    )
+                (
+                    new[]
+                    {
+                        Formatter
+                    },
+                    cancellationToken
+                )
                 .ConfigureAwait(false);
+            return result;
         }
 
         protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
@@ -88,11 +90,13 @@ namespace Byndyusoft.ApiClient
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
             var type = content.GetType();
+            var absoluteUrl = GetAbsoluteUrl(url);
+            var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
+                      RequestUri = absoluteUri,
                       Content = new ObjectContent(type, content, Formatter)
                   };
 

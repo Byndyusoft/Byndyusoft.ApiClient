@@ -1,12 +1,13 @@
 namespace Byndyusoft.ApiClient.Models;
 
 using System.IO;
+using System.Text.Json.Serialization;
 using ProtoBuf;
 
 [ProtoContract]
-public class SimpleProtobufType
+public class SimpleModel
 {
-    [ProtoMember(2)] public string Field = default!;
+    [ProtoMember(2)][JsonInclude]  public string Field = default!;
 
     [ProtoMember(1)] public int Property { get; set; }
 
@@ -16,15 +17,26 @@ public class SimpleProtobufType
 
     [ProtoMember(5)] public int[] Array { get; set; } = default!;
 
-    public static SimpleProtobufType Create()
+    public static SimpleModel Create()
     {
         return new()
                {
                    Property = 10,
                    Enum = SeekOrigin.Current,
                    Field = "string",
-                   Array = new[] {1, 2},
+                   Array = [1, 2],
                    Nullable = 100
+               };
+    }
+    public static SimpleModel Create(int property, string field, int? nullable)
+    {
+        return new()
+               {
+                   Property = property,
+                   Enum = SeekOrigin.Current,
+                   Field = field,
+                   Array = [1, 2],
+                   Nullable = nullable
                };
     }
 }

@@ -2,7 +2,8 @@
 {
     using System;
     using System.Net.Http;
-    using System.Net.Http.ProtoBuf;
+    using System.Net.Http.Json.Formatting;
+    using System.Net.Http.MessagePack.Formatting;
     using System.Net.Http.ProtoBuf.Formatting;
     using System.Threading;
     using System.Threading.Tasks;
@@ -12,64 +13,122 @@
     using Microsoft.Extensions.Options;
     using Models;
 
-    /// <summary>
-    ///     WeatherForecastController
-    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class TestController : ControllerBase
     {
-        /// <summary>
-        ///     Get
-        /// </summary>
-        [HttpGet("test")]
+        [HttpGet("test_protobuf")]
         [FormatFilter]
-        public async Task<IActionResult> Test(CancellationToken cancellationToken)
+        public async Task<IActionResult> TestProtoBuf(CancellationToken cancellationToken)
         {
             var connectionString = "http://localhost:5000/Test";
             var httpClient = new HttpClient
                 {
                     BaseAddress = new Uri(connectionString)
                 };
-            var formatter = new ProtoBufMediaTypeFormatter();
+            var formatter = new ProtoBufMediaTypeFormatter(){TypeModel = { BufferSize = 4 * 1024 * 1024 },BufferSize = 4 * 1024 * 1024};
             var options = new OptionsWrapper<ApiClientSettings>
             (
                 new ApiClientSettings(){ConnectionString = connectionString}
             );
 
             var formatterClient = new TestFormatterClient(httpClient, formatter, options);
-            var result = await formatterClient.GetAsync<SimpleProtobufType>("/get", cancellationToken);
-            result = await formatterClient.PostAsync<SimpleProtobufType>("/post", result, cancellationToken);
-            result = await formatterClient.PutAsync<SimpleProtobufType>("/put", result, cancellationToken);
+            var result = await formatterClient.GetAsync<SimpleModel>("/get", cancellationToken);
+            result = await formatterClient.GetAsync<ParamsTestModel,SimpleModel>(
+                "/with_params",
+                cancellationToken,
+                new ParamsTestModel(
+                    10101,
+                    "tuple",
+                    null));
+            result = await formatterClient.PostAsync<SimpleModel>("/post", result, cancellationToken);
+            result = await formatterClient.PutAsync<SimpleModel>("/put", result, cancellationToken);
+            return Ok(result);
+        }
+        
+        [HttpGet("test_message_pack")]
+        [FormatFilter]
+        public async Task<IActionResult> TestMessagePack(CancellationToken cancellationToken)
+        {
+            var connectionString = "http://localhost:5000/Test";
+            var httpClient = new HttpClient
+                             {
+                                 BaseAddress = new Uri(connectionString)
+                             };
+            var formatter = new MessagePackMediaTypeFormatter();
+            var options = new OptionsWrapper<ApiClientSettings>
+            (
+                new ApiClientSettings(){ConnectionString = connectionString}
+            );
+
+            var formatterClient = new TestFormatterClient(httpClient, formatter, options);
+            var result = await formatterClient.GetAsync<SimpleModel>("/get", cancellationToken);
+            result = await formatterClient.GetAsync<ParamsTestModel,SimpleModel>(
+                "/with_params",
+                cancellationToken,
+                new ParamsTestModel(
+                    10101,
+                    "tuple",
+                    null));
+            result = await formatterClient.PostAsync<SimpleModel>("/post", result, cancellationToken);
+            result = await formatterClient.PutAsync<SimpleModel>("/put", result, cancellationToken);
+            return Ok(result);
+        }
+        
+        [HttpGet("test_json")]
+        [FormatFilter]
+        public async Task<IActionResult> TestJson(CancellationToken cancellationToken)
+        {
+            var connectionString = "http://localhost:5000/Test";
+            var httpClient = new HttpClient
+                             {
+                                 BaseAddress = new Uri(connectionString)
+                             };
+            var formatter = new JsonMediaTypeFormatter();
+            var options = new OptionsWrapper<ApiClientSettings>
+            (
+                new ApiClientSettings(){ConnectionString = connectionString}
+            );
+
+            var formatterClient = new TestFormatterClient(httpClient, formatter, options);
+            var result = await formatterClient.GetAsync<SimpleModel>("/get", cancellationToken);
+            result = await formatterClient.GetAsync<ParamsTestModel,SimpleModel>(
+                "/with_params",
+                cancellationToken,
+                new ParamsTestModel(
+                    10101,
+                    "tuple",
+                    null));
+            result = await formatterClient.PostAsync<SimpleModel>("/post", result, cancellationToken);
+            result = await formatterClient.PutAsync<SimpleModel>("/put", result, cancellationToken);
             return Ok(result);
         }
 
         [HttpPost("post")]
-        public async Task<IActionResult> Post([FromBody] SimpleProtobufType model, CancellationToken cancellationToken)
+        public IActionResult Post([FromBody] SimpleModel model)
         {
-            var result = ProtoBufContent.Create(model);
-            return await FromProtoBufContent(result, cancellationToken);
+            return Ok(model);
         }
 
         [HttpPut("put")]
-        public async Task<IActionResult> Put([FromBody] SimpleProtobufType model, CancellationToken cancellationToken)
+        public IActionResult Put([FromBody] SimpleModel model)
         {
-            var result = ProtoBufContent.Create(model);
-            return await FromProtoBufContent(result, cancellationToken);
+            return Ok(model);
         }
 
         [HttpGet("get")]
-        public async Task<IActionResult> Get(CancellationToken cancellationToken)
+        public IActionResult Get()
         {
-            var result = ProtoBufContent.Create(SimpleProtobufType.Create());
-            return await FromProtoBufContent(result, cancellationToken);
+            return Ok(SimpleModel.Create());
         }
 
-        private static async Task<IActionResult> FromProtoBufContent(ProtoBufContent content, CancellationToken cancellationToken)
+        [HttpGet("with_params")]
+        public IActionResult WithParams(
+            [FromQuery] int property,
+            [FromQuery] string field,
+            [FromQuery] int? nullable)
         {
-            var resulString = await content.ReadAsStringAsync(cancellationToken);
-            var contentType = content.Headers.ContentType.ToString();
-            return new ContentResult() { Content = resulString, ContentType = contentType, StatusCode = 200 };
+            return Ok(SimpleModel.Create(property, field, nullable));
         }
     }
 }

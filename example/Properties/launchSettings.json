@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Byndyusoft.AspNetCore.Mvc.Formatters.ProtoBuf.Example": {
+    "Byndyusoft.ApiClient.Example": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

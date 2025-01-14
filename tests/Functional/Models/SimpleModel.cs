@@ -1,6 +1,7 @@
 namespace Byndyusoft.ApiClient.Models;
 
 using System.IO;
+using System.Text.Json.Serialization;
 using ProtoBuf;
 using Xunit;
 
@@ -9,9 +10,9 @@ public class NonContractType
 }
 
 [ProtoContract]
-public class SimpleType
+public class SimpleModel
 {
-    [ProtoMember(2)] public string Field = default!;
+    [ProtoMember(2)][JsonInclude] public string Field = default!;
 
     [ProtoMember(1)] public int Property { get; set; }
 
@@ -21,7 +22,7 @@ public class SimpleType
 
     [ProtoMember(5)] public int[] Array { get; set; } = default!;
 
-    public static SimpleType Create()
+    public static SimpleModel Create()
     {
         return new()
                {

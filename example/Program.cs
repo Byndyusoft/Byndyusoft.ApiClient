@@ -29,6 +29,7 @@ services.AddSwagger();
 services
     .AddMvcCore()
     .AddProtoBufFormatters()
+    .AddMessagePackFormatters()
     .AddFormatterMappings();
 services.AddControllers();
 

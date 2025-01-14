@@ -3,6 +3,7 @@ namespace Byndyusoft.ApiClient
     using System;
     using System.Net.Http;
     using System.Net.Http.Formatting;
+    using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Options;
@@ -19,49 +20,27 @@ namespace Byndyusoft.ApiClient
         ):base(client, apiSettings)
         {
             Formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
+            foreach (var mediaTypeHeaderValue in Formatter.SupportedMediaTypes)
+                Client.DefaultRequestHeaders.Accept.Add
+                (
+                    new MediaTypeWithQualityHeaderValue
+                    (
+                        mediaTypeHeaderValue.MediaType
+                    )
+                );
         }
         
-        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
-        {
-            var absoluteUrl = GetAbsoluteUrl(url);
-            var response = await Client.GetAsync(absoluteUrl, cancellationToken).ConfigureAwait(false);
-            await Toolkit.EnsureSuccessStatusCode(response);
-            var result = await response
-                .Content
-                .ReadAsAsync<TResult>
-                (
-                    new[]
-                    {
-                        Formatter
-                    },
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
-            return result;
-        }
+        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken) =>
+            await CallAsync<TResult>(HttpMethod.Get, url, null, cancellationToken);
 
         protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
             where TParams : class
         {
-            var endpoint = GetAbsoluteUrl(url);
             var httpQuery = dto != null
-                ? $"{endpoint}?{HttpGetParamsBuilder.Build(dto)}"
-                : endpoint;
-
-            var response = await Client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
-
-            await Toolkit.EnsureSuccessStatusCode(response);
-            return await response
-                .Content
-                .ReadAsAsync<TResult>
-                (
-                    new[]
-                    {
-                        Formatter
-                    },
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
+                ? $"{url}?{HttpGetParamsBuilder.Build(dto)}"
+                : url;
+            var result = await CallAsync<TResult>(HttpMethod.Get, httpQuery, null, cancellationToken).ConfigureAwait(false);
+            return result;
         }
 
         protected Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
@@ -89,7 +68,6 @@ namespace Byndyusoft.ApiClient
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
-            var type = content.GetType();
             var absoluteUrl = GetAbsoluteUrl(url);
             var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
             var requestMessage
@@ -97,13 +75,19 @@ namespace Byndyusoft.ApiClient
                   {
                       Method = method,
                       RequestUri = absoluteUri,
-                      Content = new ObjectContent(type, content, Formatter)
                   };
+            if (content != null)
+            {
+                var type = content.GetType();
+                requestMessage.Content = new ObjectContent(type, content, Formatter);
+            }
+            if(Formatter.GetType().Name.ToLower().Contains("protobuf"))
+                requestMessage.Version = new Version(1, 0);
 
             var response = await Client.SendAsync(requestMessage, cancellationToken);
 
             await Toolkit.EnsureSuccessStatusCode(response);
-            return await response
+            var result = await response
                 .Content
                 .ReadAsAsync<TResult>
                 (
@@ -114,6 +98,7 @@ namespace Byndyusoft.ApiClient
                     cancellationToken
                 )
                 .ConfigureAwait(false);
+            return result;
         }
 
         protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)

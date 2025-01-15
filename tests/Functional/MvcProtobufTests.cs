@@ -1,15 +1,12 @@
 namespace Byndyusoft.ApiClient.Functional
 {
     using System.Net.Http;
-    using System.Net.Http.MessagePack;
-    using System.Net.Http.MessagePack.Formatting;
     using System.Net.Http.ProtoBuf;
     using System.Net.Http.ProtoBuf.Formatting;
     using System.Threading;
     using System.Threading.Tasks;
     using Byndyusoft.ApiClient.Models;
     using Client;
-    using MessagePack;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using ProtoBuf.Meta;
@@ -41,10 +38,12 @@ namespace Byndyusoft.ApiClient.Functional
 
         protected override void ConfigureMvc(IMvcCoreBuilder builder)
         {
-            builder.AddProtoBufFormatters(options => { options.TypeModel = _typeModel; });
+            builder
+                .AddProtoBufNet(options => { options.Model = _typeModel; });
         }
-        [Fact(Skip = "Protobuf not working")]
-        public async Task PostAsMessagePackAsync()
+
+        [Fact]
+        public async Task PostAsync()
         {
             // Arrange
             var input = SimpleModel.Create();
@@ -58,8 +57,8 @@ namespace Byndyusoft.ApiClient.Functional
             model.Verify();
         }
 
-        [Fact(Skip = "Protobuf not working")]
-        public async Task PutAsMessagePackAsync()
+        [Fact]
+        public async Task PutAsync()
         {
             // Arrange
             var input = SimpleModel.Create();
@@ -74,8 +73,8 @@ namespace Byndyusoft.ApiClient.Functional
             model.Verify();
         }
 
-        [Fact(Skip = "Protobuf not working")]
-        public async Task GetFromMessagePackAsync()
+        [Fact]
+        public async Task GetAsync()
         {
             // Act
             var response = await _testSubject.GetAsync<SimpleModel>("/formatter/get", CancellationToken.None);

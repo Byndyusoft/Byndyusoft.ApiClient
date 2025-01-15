@@ -68,6 +68,7 @@ namespace Byndyusoft.ApiClient
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var isProtobuf = Formatter.GetType().Name.ToLower().Contains("protobuf");
             var absoluteUrl = GetAbsoluteUrl(url);
             var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
             var requestMessage
@@ -79,9 +80,17 @@ namespace Byndyusoft.ApiClient
             if (content != null)
             {
                 var type = content.GetType();
-                requestMessage.Content = new ObjectContent(type, content, Formatter);
+                var objContent = new ObjectContent(type, content, Formatter);
+                requestMessage.Content = objContent;
+                if (isProtobuf)
+                {
+                    var len = await objContent.ReadAsByteArrayAsync();
+                    requestMessage.Content.Headers.ContentLength = len.LongLength;
+                    requestMessage.Headers.TransferEncodingChunked = false;
+                }
             }
-            if(Formatter.GetType().Name.ToLower().Contains("protobuf"))
+
+            if (isProtobuf)
                 requestMessage.Version = new Version(1, 0);
 
             var response = await Client.SendAsync(requestMessage, cancellationToken);

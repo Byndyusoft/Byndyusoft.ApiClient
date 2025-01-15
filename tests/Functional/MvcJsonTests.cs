@@ -3,16 +3,12 @@ namespace Byndyusoft.ApiClient.Functional
     using System.Net.Http;
     using System.Net.Http.Json;
     using System.Net.Http.Json.Formatting;
-    using System.Net.Http.MessagePack;
-    using System.Net.Http.MessagePack.Formatting;
     using System.Text.Json;
     using System.Text.Json.Serialization.Metadata;
     using System.Threading;
     using System.Threading.Tasks;
     using Byndyusoft.ApiClient.Models;
     using Client;
-    using MessagePack;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
     using Xunit;
@@ -54,6 +50,7 @@ namespace Byndyusoft.ApiClient.Functional
                 }
             );
         }
+
         [Fact]
         public async Task PostAsMessagePackAsync()
         {

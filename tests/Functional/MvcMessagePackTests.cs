@@ -41,8 +41,9 @@ namespace Byndyusoft.ApiClient.Functional
         {
             builder.AddMessagePackFormatters(options => { options.SerializerOptions = _serializerOptions; });
         }
+
         [Fact]
-        public async Task PostAsMessagePackAsync()
+        public async Task PostAsync()
         {
             // Arrange
             var input = SimpleModel.Create();
@@ -57,7 +58,7 @@ namespace Byndyusoft.ApiClient.Functional
         }
 
         [Fact]
-        public async Task PutAsMessagePackAsync()
+        public async Task PutAsync()
         {
             // Arrange
             var input = SimpleModel.Create();
@@ -73,7 +74,7 @@ namespace Byndyusoft.ApiClient.Functional
         }
 
         [Fact]
-        public async Task GetFromMessagePackAsync()
+        public async Task GetAsync()
         {
             // Act
             var response = await _testSubject.GetAsync<SimpleModel>("/formatter/get", CancellationToken.None);

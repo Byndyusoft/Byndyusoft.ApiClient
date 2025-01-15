@@ -14,16 +14,27 @@ dotnet add package Byndyusoft.ApiClient
 ```
 
 ## Usage
-To create an API client:
+To create an Base API client:
 1. Create your API client class and derive it from BaseClient class:
 ```
 public class SomeApiClient : BaseClient
 {
 	public SomeApiClient(HttpClient client, IOptions<ApiClientSettings> apiSettings) : base(client, apiSettings)
-    	{
+	{
 	}
 }
 ```
+or create your API client class and derive it from FormatterClient class:
+```
+public class SomeApiClient : FormatterClient
+{
+	public SomeApiClient(HttpClient client, MediaTypeFormatter formatter, IOptions<ApiClientSettings> apiSettings) : base(client, formatter, apiSettings)
+	{
+	}
+}
+```
+Json, MessagePack or ProtoBuf MediaTypeFormatters are supported currently with Byndyusoft.Net.Http.Json, Byndyusoft.Net.Http.MessagePack and Byndyusoft.Net.Http.ProtoBuf packages
+
 2. Great! Now you can use the BaseClient methods to declare your methods:
 ```
 public Task<Model> Create(CreateModelRequest createModelRequest)

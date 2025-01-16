@@ -7,7 +7,7 @@
     [Route("formatter")]
     public class FormatterController : ControllerBase
     {
-        [HttpPost("post")]
+        [HttpPost]
         [Route("post")]
         [FormatFilter]
         public IActionResult Post([FromBody] SimpleModel model)
@@ -15,7 +15,7 @@
             return Ok(model);
         }
 
-        [HttpPut("put")]
+        [HttpPut]
         [Route("put")]
         [FormatFilter]
         public IActionResult Put([FromBody] SimpleModel model)
@@ -23,12 +23,24 @@
             return Ok(model);
         }
 
-        [HttpGet("get")]
+        [HttpGet]
         [Route("get")]
         [FormatFilter]
         public IActionResult Get()
         {
             return Ok(SimpleModel.Create());
+        }
+        
+
+        [HttpGet]
+        [Route("with_params")]
+        [FormatFilter]
+        public IActionResult WithParams(
+            [FromQuery] int property,
+            [FromQuery] string field,
+            [FromQuery] int? nullable)
+        {
+            return Ok(SimpleModel.Create(property, field:field, nullable:nullable));
         }
     }
 }

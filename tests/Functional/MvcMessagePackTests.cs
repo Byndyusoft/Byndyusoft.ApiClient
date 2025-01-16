@@ -1,89 +1,40 @@
-namespace Byndyusoft.ApiClient.Functional
+namespace Byndyusoft.ApiClient.Functional;
+
+using System.Net.Http;
+using System.Net.Http.MessagePack;
+using System.Net.Http.MessagePack.Formatting;
+using Client;
+using MessagePack;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Xunit.Abstractions;
+
+public class MvcMessagePackTests : MvcFormattersTests
 {
-    using System.Net.Http;
-    using System.Net.Http.MessagePack;
-    using System.Net.Http.MessagePack.Formatting;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Byndyusoft.ApiClient.Models;
-    using Client;
-    using MessagePack;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Options;
-    using Xunit;
+    private readonly MessagePackSerializerOptions _serializerOptions;
 
-    public class MvcMessagePackTests : MvcTestFixture
+    public MvcMessagePackTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
     {
-        private readonly MessagePackSerializerOptions _serializerOptions;
-        private readonly TestFormatterClient _testSubject;
+        _serializerOptions = MessagePackDefaults.SerializerOptions;
+        TestSubject = new TestFormatterClient(
+            Client,
+            new MessagePackMediaTypeFormatter(_serializerOptions),
+            new OptionsWrapper<ApiClientSettings>(
+                new ApiClientSettings
+                {
+                    ConnectionString = _url
+                }
+            )
+        );
+    }
 
-        public MvcMessagePackTests()
-        {
-            _serializerOptions = MessagePackDefaults.SerializerOptions;
-            _testSubject = new TestFormatterClient(
-                Client,
-                new MessagePackMediaTypeFormatter(_serializerOptions),
-                new OptionsWrapper<ApiClientSettings>(
-                    new ApiClientSettings
-                    {
-                        ConnectionString = _url
-                    }
-                )
-            );
-        }
+    protected override void ConfigureHttpClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Accept.Add(MessagePackDefaults.MediaTypeHeader);
+    }
 
-        protected override void ConfigureHttpClient(HttpClient client)
-        {
-            client.DefaultRequestHeaders.Accept.Add(MessagePackDefaults.MediaTypeHeader);
-        }
-
-        protected override void ConfigureMvc(IMvcCoreBuilder builder)
-        {
-            builder.AddMessagePackFormatters(options => { options.SerializerOptions = _serializerOptions; });
-        }
-
-        [Fact]
-        public async Task PostAsync()
-        {
-            // Arrange
-            var input = SimpleModel.Create();
-
-            // Act
-            var response = await _testSubject.PostAsync<SimpleModel>("/formatter/post", input, CancellationToken.None);
-            
-            // Assert
-            Assert.NotNull(response);
-            var model = Assert.IsType<SimpleModel>(response);
-            model.Verify();
-        }
-
-        [Fact]
-        public async Task PutAsync()
-        {
-            // Arrange
-            var input = SimpleModel.Create();
-
-            // Act
-            var response = await _testSubject.PutAsync<SimpleModel>("/formatter/put", input, CancellationToken.None);
-
-            // Assert
-            Assert.NotNull(response);
-            var model = Assert.IsType<SimpleModel>(response);
-
-            model.Verify();
-        }
-
-        [Fact]
-        public async Task GetAsync()
-        {
-            // Act
-            var response = await _testSubject.GetAsync<SimpleModel>("/formatter/get", CancellationToken.None);
-
-            // Assert
-            Assert.NotNull(response);
-            var model = Assert.IsType<SimpleModel>(response);
-
-            model.Verify();
-        }
+    protected override void ConfigureMvc(IMvcCoreBuilder builder)
+    {
+        builder.AddMessagePackFormatters(options => { options.SerializerOptions = _serializerOptions; });
     }
 }

@@ -68,6 +68,33 @@ namespace Byndyusoft.ApiClient
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var response = await CallAsyncBase(method, url, content, cancellationToken).ConfigureAwait(false);
+            var result = await response!
+                .Content
+                .ReadAsAsync<TResult>
+                (
+                    new[]
+                    {
+                        Formatter
+                    },
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+            return result;
+        }
+
+        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        {
+            await CallAsyncBase(method, url, content, cancellationToken).ConfigureAwait(false);
+        }
+
+        private async Task<HttpResponseMessage?> CallAsyncBase
+        (
+            HttpMethod method,
+            string url,
+            object? content,
+            CancellationToken cancellationToken)
+        {
             var isProtobuf = Formatter.GetType().Name.ToLower().Contains("protobuf");
             var absoluteUrl = GetAbsoluteUrl(url);
             var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
@@ -93,35 +120,9 @@ namespace Byndyusoft.ApiClient
             if (isProtobuf)
                 requestMessage.Version = new Version(1, 0);
 
-            var response = await Client.SendAsync(requestMessage, cancellationToken);
-
-            await Toolkit.EnsureSuccessStatusCode(response);
-            var result = await response
-                .Content
-                .ReadAsAsync<TResult>
-                (
-                    new[]
-                    {
-                        Formatter
-                    },
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
-            return result;
-        }
-
-        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
-        {
-            var type = content.GetType();
-            var requestMessage
-                = new HttpRequestMessage
-                  {
-                      Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = new ObjectContent(type, content, Formatter)
-                  };
             var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-            await Toolkit.EnsureSuccessStatusCode(response);
+            await Toolkit.EnsureSuccessStatusCode(response).ConfigureAwait(false);
+            return response;
         }
     }
 }

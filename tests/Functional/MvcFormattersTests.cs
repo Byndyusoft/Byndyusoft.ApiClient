@@ -109,24 +109,33 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
             input,
             CancellationToken.None
         );
-        
-        // Assert
-        Assert.NotNull(response);
-        var model = Assert.IsType<SimpleModel>(response);
-        model.Verify();
-
-        // Act
+        response = await TestSubject.PutAsync<SimpleModel>
+        (
+            $"/formatter/list/put/{id}",
+            response,
+            CancellationToken.None
+        );
+        response = await TestSubject.PatchAsync<SimpleModel>
+        (
+            $"/formatter/list/patch/{id}",
+            response,
+            CancellationToken.None
+        );
         response = await TestSubject.GetAsync<SimpleModel>
         (
             $"/formatter/list/get/{id}",
             CancellationToken.None
         );
-        
+        await TestSubject.DeleteAsync
+        (
+            $"/formatter/list/delete/{id}",
+            CancellationToken.None
+        );
+
         // Assert
         Assert.NotNull(response);
-        model = Assert.IsType<SimpleModel>(response);
+        var model = Assert.IsType<SimpleModel>(response);
         model.Verify();
-        await TestSubject.DeleteAsync($"/formatter/list/delete/{id}", CancellationToken.None);
     }
 
     [Fact]

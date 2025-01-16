@@ -52,6 +52,12 @@ namespace Byndyusoft.ApiClient
         protected Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
             CallAsync<TResult>(HttpMethod.Put, url, content, cancellationToken);
 
+        protected Task PutAsync(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync(HttpMethod.Put, url, content, cancellationToken);
+
+        protected Task<TResult> PatchAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync<TResult>(new HttpMethod("PATCH"), url, content, cancellationToken);
+
         protected Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
             CallAsync(new HttpMethod("PATCH"), url, content, cancellationToken);
 

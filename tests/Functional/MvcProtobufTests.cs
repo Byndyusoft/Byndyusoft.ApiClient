@@ -22,7 +22,7 @@ public class MvcProtobufTests : MvcFormattersTests
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings
                 {
-                    ConnectionString = _url
+                    ConnectionString = URL
                 }
             )
         );

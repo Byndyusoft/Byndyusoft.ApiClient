@@ -17,28 +17,17 @@
             ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
         }
 
-        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
-        {
-            var response = await Client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
-            
-            await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
-        }
+        protected Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken) => 
+            CallAsync<TResult>(HttpMethod.Get, url, null, cancellationToken);
 
         protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
             where TParams : class
         {
-            var endpoint = GetAbsoluteUrl(url);
             var httpQuery = dto != null
-                ? $"{endpoint}?{HttpGetParamsBuilder.Build(dto)}"
-                : endpoint;
+                ? $"{url}?{HttpGetParamsBuilder.Build(dto)}"
+                : url;
 
-            var response = await Client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
-
-            await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            return await CallAsync<TResult>(HttpMethod.Get, httpQuery, null, cancellationToken);
         }
 
         protected Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
@@ -49,6 +38,12 @@
 
         protected Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
             CallAsync<TResult>(HttpMethod.Put, url, content, cancellationToken);
+
+        protected Task PutAsync(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync(HttpMethod.Put, url, content, cancellationToken);
+
+        protected Task<TResult> PatchAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync<TResult>(new HttpMethod("PATCH"), url, content, cancellationToken);
 
         protected Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
             CallAsync(new HttpMethod("PATCH"), url, content, cancellationToken);
@@ -66,34 +61,30 @@
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
-            var requestMessage
-                = new HttpRequestMessage
-                  {
-                      Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
-                  };
-
-            var response = await Client.SendAsync(requestMessage, cancellationToken);
-
-            await Toolkit.EnsureSuccessStatusCode(response);
-
+            var response = await CallAsyncBase(method, url, content, cancellationToken).ConfigureAwait(false);
             return await response.Content.ReadAsJsonAsync<TResult>();
         }
 
         protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        {
+            await CallAsyncBase(method, url, content, cancellationToken);
+        }
+
+        private async Task<HttpResponseMessage> CallAsyncBase(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
                       RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
                   };
+            if(content != null)
+                requestMessage.Content = HttpContentExtensions.PrepareHttpContent(content);
 
             var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
 
             await Toolkit.EnsureSuccessStatusCode(response);
+            return response;
         }
     }
 }

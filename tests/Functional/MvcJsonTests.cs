@@ -8,10 +8,8 @@ using System.Text.Json.Serialization.Metadata;
 using Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Xunit;
 using Xunit.Abstractions;
 
-[CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]
 public class MvcJsonTests : MvcFormattersTests
 {
     private readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web)
@@ -27,7 +25,7 @@ public class MvcJsonTests : MvcFormattersTests
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings
                 {
-                    ConnectionString = _url
+                    ConnectionString = URL
                 }
             )
         );

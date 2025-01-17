@@ -16,7 +16,7 @@ public class MvcProtobufTests : MvcFormattersTests
     public MvcProtobufTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
     {
         _typeModel = ProtoBufDefaults.TypeModel;
-        TestSubject = new TestFormatterClient(
+        TestSubject = new TestFormatterSimpleModelClient(
             Client,
             new ProtoBufMediaTypeFormatter(_typeModel),
             new OptionsWrapper<ApiClientSettings>(

@@ -5,6 +5,8 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Reflection;
+using Byndyusoft.ApiClient.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,19 +17,20 @@ public abstract class MvcTestFixture : IDisposable
 {
     protected readonly string URL;
     private HttpClient? _client;
-    private IHost? _host;
+    protected IHost? _host;
 
     protected MvcTestFixture()
     {
         URL = $"http://localhost:{FreeTcpPort()}";
-        _host =
-            Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(webBuilder =>
-                                          {
-                                              webBuilder.UseUrls(URL);
-                                              webBuilder.ConfigureServices(ConfigureServices);
-                                              webBuilder.Configure(Configure);
-                                          })
+        _host = Host.CreateDefaultBuilder()
+                .ConfigureWebHostDefaults(
+                    webBuilder =>
+                    {
+                        webBuilder.UseUrls(URL);
+                        webBuilder.ConfigureServices(ConfigureServices);
+                        webBuilder.Configure(Configure);
+                    }
+                )
                 .Build();
         _host.Start();
     }
@@ -60,14 +63,20 @@ public abstract class MvcTestFixture : IDisposable
     public void Configure(IApplicationBuilder app)
     {
         app.UseRouting();
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddLogging(c => c.ClearProviders());
         services.AddControllers();
-        ConfigureMvc(services.AddMvcCore());
+        var assembly = Assembly.GetAssembly(typeof(SimpleModelController));
+        ConfigureMvc(
+            services
+                .AddMvcCore()
+                .AddApplicationPart(assembly!)
+                .AddControllersAsServices()
+            );
     }
 
     protected abstract void ConfigureMvc(IMvcCoreBuilder builder);

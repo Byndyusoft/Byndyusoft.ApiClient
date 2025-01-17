@@ -40,7 +40,7 @@ namespace Byndyusoft.ApiClient
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken) =>
             await CallAsync<TResult>(HttpMethod.Get, url, null, cancellationToken);
 
-        protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
+        protected async Task<TResult> GetAsync<TParams, TResult>(string url, TParams? dto, CancellationToken cancellationToken)
             where TParams : class
         {
             var httpQuery = dto != null

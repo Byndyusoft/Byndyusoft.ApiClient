@@ -1,7 +1,6 @@
-namespace Byndyusoft.ApiClient.Functional.Models;
+namespace Byndyusoft.ApiClient.Models;
 
 using System.Collections.Generic;
-using ApiClient.Models;
 using ProtoBuf;
 
 [ProtoContract]

@@ -2,18 +2,18 @@ namespace Byndyusoft.ApiClient.Functional;
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ApiClient.Models;
 using Client;
-using Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Xunit;
 using Xunit.Abstractions;
-using ParamsTestModel = Models.ParamsTestModel;
 
 public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : MvcTestFixture
 {
-    protected TestFormatterClient TestSubject;
+    protected TestFormatterSimpleModelClient TestSubject;
     private static int _idProvider = 0;
 
     [Fact]
@@ -52,7 +52,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
     protected async Task GetAsyncTest()
     {
         // Act
-        var response = await TestSubject.GetAsync<SimpleModel>("/formatter/get", CancellationToken.None);
+        var response = await TestSubject.GetModelAsync(CancellationToken.None);
 
         // Assert
         Assert.NotNull(response);
@@ -72,10 +72,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
             null);
 
         // Act
-        var response = await TestSubject.GetAsync<ParamsTestModel,SimpleModel>(
-            "/formatter/with_params",
-            CancellationToken.None,
-            input);
+        var response = await TestSubject.GetWithParamsAsync(input, CancellationToken.None);
         // Assert
         Assert.NotNull(response);
         var model = Assert.IsType<SimpleModel>(response);
@@ -126,11 +123,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
             response,
             CancellationToken.None
         );
-        response = await TestSubject.GetAsync<SimpleModel>
-        (
-            $"/formatter/list/get/{id}",
-            CancellationToken.None
-        );
+        response = await TestSubject.GetSingleFromListModelAsync(id, CancellationToken.None);
         await TestSubject.DeleteAsync
         (
             $"/formatter/list/delete/{id}",
@@ -170,11 +163,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
 
         stopwatch.Reset();
         stopwatch.Start();
-        var response = await TestSubject.GetAsync<List<SimpleModel>>
-        (
-            $"/formatter/list/getAll/{id}",
-            CancellationToken.None
-        );
+        var response = await TestSubject.GetAllFromListModelAsync(id, CancellationToken.None);
         stopwatch.Stop();
         testOutputHelper.WriteLine(stopwatch.Elapsed.ToString());
         

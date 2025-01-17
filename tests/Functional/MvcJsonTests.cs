@@ -19,7 +19,7 @@ public class MvcJsonTests : MvcFormattersTests
 
     public MvcJsonTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
-        TestSubject = new TestFormatterClient(
+        TestSubject = new TestFormatterSimpleModelClient(
             Client,
             new JsonMediaTypeFormatter(_serializerOptions),
             new OptionsWrapper<ApiClientSettings>(

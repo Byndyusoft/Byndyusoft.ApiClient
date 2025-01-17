@@ -1,36 +1,35 @@
 namespace Byndyusoft.ApiClient.Client;
 
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 using Byndyusoft.ApiClient;
 using Microsoft.Extensions.Options;
+using Models;
 
-public class TestFormatterClient : BaseClient
+public class TestFormatterSimpleModelClient : BaseClient
 {
-    public TestFormatterClient
-        (
+    public TestFormatterSimpleModelClient(
             HttpClient client,
             MediaTypeFormatter formatter,
             IOptions<ApiClientSettings> apiSettings
         )
-        : base
-        (
-            client,
-            apiSettings,
-            formatter
-        )
-    {
-    }
+        : base(client, apiSettings, formatter) { }
 
 
-    public Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
-        => base.GetAsync<TResult>(url, cancellationToken);
+    public Task<SimpleModel> GetModelAsync(CancellationToken cancellationToken)
+        => GetAsync<SimpleModel>("/SimpleModel/get", cancellationToken);
 
-    public Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
-        where TParams : class
-        => base.GetAsync<TParams, TResult>(url, cancellationToken, dto);
+    public Task<SimpleModel> GetWithParamsAsync(ParamsTestModel model, CancellationToken cancellationToken)
+        => GetAsync<ParamsTestModel, SimpleModel>("/SimpleModel/with_params", model, cancellationToken);
+
+    public Task<SimpleModel> GetSingleFromListModelAsync(int id, CancellationToken cancellationToken)
+        => GetAsync<SimpleModel>($"/SimpleModelList/get/{id}", cancellationToken);
+
+    public Task<List<SimpleModel>> GetAllFromListModelAsync(int id, CancellationToken cancellationToken)
+        => GetAsync<List<SimpleModel>>($"/SimpleModelList/getAll/{id}", cancellationToken);
 
     public Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
         base.PostAsync(url, content, cancellationToken);

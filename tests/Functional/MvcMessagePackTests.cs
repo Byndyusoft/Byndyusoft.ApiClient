@@ -16,7 +16,7 @@ public class MvcMessagePackTests : MvcFormattersTests
     public MvcMessagePackTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
     {
         _serializerOptions = MessagePackDefaults.SerializerOptions;
-        TestSubject = new TestFormatterClient(
+        TestSubject = new TestFormatterSimpleModelClient(
             Client,
             new MessagePackMediaTypeFormatter(_serializerOptions),
             new OptionsWrapper<ApiClientSettings>(

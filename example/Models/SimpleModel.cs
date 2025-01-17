@@ -18,8 +18,7 @@ public class SimpleModel
     [ProtoMember(4)] public int? Nullable { get; set; }
 
     [ProtoMember(5)] public int[] Array { get; set; } = default!;
-    public static SimpleModel Create
-    (
+    public static SimpleModel Create(
         int property = 10,
         SeekOrigin @enum = SeekOrigin.Current,
         string field = "string",

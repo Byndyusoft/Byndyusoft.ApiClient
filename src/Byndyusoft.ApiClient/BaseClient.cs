@@ -1,44 +1,54 @@
-﻿namespace Byndyusoft.ApiClient
+namespace Byndyusoft.ApiClient
 {
     using System;
     using System.Net.Http;
+    using System.Net.Http.Formatting;
+    using System.Net.Http.Headers;
+    using System.Net.Http.Json;
+    using System.Net.Http.Json.Formatting;
+    using System.Net.Http.ProtoBuf.Formatting;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Options;
 
     public class BaseClient
     {
-        protected readonly ApiClientSettings ApiSettings;
+        protected readonly MediaTypeFormatter Formatter;
         protected readonly HttpClient Client;
+        protected readonly ApiClientSettings ApiSettings;
 
-        protected BaseClient(HttpClient client, IOptions<ApiClientSettings> apiSettings)
+        protected BaseClient
+        (
+            HttpClient client,
+            IOptions<ApiClientSettings> apiSettings,
+            MediaTypeFormatter? formatter = null
+        )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
             ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
+            Formatter = formatter ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
+            foreach (var mediaTypeHeaderValue in Formatter.SupportedMediaTypes)
+                Client.DefaultRequestHeaders.Accept.Add
+                (
+                    new MediaTypeWithQualityHeaderValue
+                    (
+                        mediaTypeHeaderValue.MediaType
+                    )
+                );
         }
-
-        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
-        {
-            var response = await Client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
-            
-            await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
-        }
+        
+        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken) =>
+            await CallAsync<TResult>(HttpMethod.Get, url, null, cancellationToken);
 
         protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
             where TParams : class
         {
-            var endpoint = GetAbsoluteUrl(url);
             var httpQuery = dto != null
-                ? $"{endpoint}?{HttpGetParamsBuilder.Build(dto)}"
-                : endpoint;
-
-            var response = await Client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
-
-            await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+                ? $"{url}?{HttpGetParamsBuilder.Build(dto)}"
+                : url;
+            var result = await CallAsync<TResult>(HttpMethod.Get, httpQuery, null, cancellationToken).ConfigureAwait(false);
+            return result;
         }
 
         protected Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
@@ -66,34 +76,60 @@
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var isProtobuf = Formatter.GetType() == typeof(ProtoBufMediaTypeFormatter);
+            var absoluteUrl = GetAbsoluteUrl(url);
+            var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
+                      RequestUri = absoluteUri,
                   };
+            if (content != null)
+            {
+                var type = content.GetType();
+                var objContent = new ObjectContent(type, content, Formatter);
+                requestMessage.Content = objContent;
+                if (isProtobuf)
+                {
+                    var len = await objContent.ReadAsByteArrayAsync();
+                    requestMessage.Content.Headers.ContentLength = len.LongLength;
+                    requestMessage.Headers.TransferEncodingChunked = false;
+                }
+            }
+
+            if (isProtobuf)
+                requestMessage.Version = new Version(1, 0);
 
             var response = await Client.SendAsync(requestMessage, cancellationToken);
 
-            await Toolkit.EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            response.EnsureSuccessStatusCode();
+            var result = await response
+                .Content
+                .ReadAsAsync<TResult>
+                (
+                    new[]
+                    {
+                        Formatter
+                    },
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+            return result;
         }
 
         protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var type = content.GetType();
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
                       RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
+                      Content = new ObjectContent(type, content, Formatter)
                   };
-
             var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-
-            await Toolkit.EnsureSuccessStatusCode(response);
+            response.EnsureSuccessStatusCode();
         }
     }
 }

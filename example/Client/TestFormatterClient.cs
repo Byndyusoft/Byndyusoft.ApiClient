@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Byndyusoft.ApiClient;
 using Microsoft.Extensions.Options;
 
-public class TestFormatterClient : FormatterClient
+public class TestFormatterClient : BaseClient
 {
     public TestFormatterClient
         (
@@ -18,8 +18,8 @@ public class TestFormatterClient : FormatterClient
         : base
         (
             client,
-            formatter,
-            apiSettings
+            apiSettings,
+            formatter
         )
     {
     }

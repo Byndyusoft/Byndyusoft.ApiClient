@@ -14,7 +14,7 @@ dotnet add package Byndyusoft.ApiClient
 ```
 
 ## Usage
-To create an Base API client:
+To create an API client:
 1. Create your API client class and derive it from BaseClient class:
 ```
 public class SomeApiClient : BaseClient

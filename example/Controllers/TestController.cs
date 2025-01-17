@@ -128,7 +128,7 @@
             [FromQuery] string field,
             [FromQuery] int? nullable)
         {
-            return Ok(SimpleModel.Create(property, field, nullable));
+            return Ok(SimpleModel.Create(property, field:field, nullable:nullable));
         }
     }
 }

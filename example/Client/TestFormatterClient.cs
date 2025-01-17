@@ -41,6 +41,12 @@ public class TestFormatterClient : BaseClient
     public Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
         base.PutAsync<TResult>(url, content, cancellationToken);
 
+    public Task PutAsync(string url, object content, CancellationToken cancellationToken) =>
+        base.PutAsync(url, content, cancellationToken);
+
+    public Task<TResult> PatchAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
+        base.PatchAsync<TResult>(url, content, cancellationToken);
+
     public Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
         base.PatchAsync(url, content, cancellationToken);
 

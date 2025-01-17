@@ -7,7 +7,6 @@ namespace Byndyusoft.ApiClient
     using System.Net.Http.Json;
     using System.Net.Http.Json.Formatting;
     using System.Net.Http.ProtoBuf.Formatting;
-    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Options;
@@ -60,6 +59,12 @@ namespace Byndyusoft.ApiClient
         protected Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
             CallAsync<TResult>(HttpMethod.Put, url, content, cancellationToken);
 
+        protected Task PutAsync(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync(HttpMethod.Put, url, content, cancellationToken);
+
+        protected Task<TResult> PatchAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync<TResult>(new HttpMethod("PATCH"), url, content, cancellationToken);
+
         protected Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
             CallAsync(new HttpMethod("PATCH"), url, content, cancellationToken);
 
@@ -75,6 +80,29 @@ namespace Byndyusoft.ApiClient
         }
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        {
+            var response = await CallAsyncBase(method, url, content, cancellationToken).ConfigureAwait(false);
+            
+            var result = await response
+                .Content
+                .ReadAsAsync<TResult>
+                (
+                    new[]
+                    {
+                        Formatter
+                    },
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+            return result;
+        }
+
+        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        {
+            await CallAsyncBase(method, url, content, cancellationToken);
+        }
+
+        private async Task<HttpResponseMessage> CallAsyncBase(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
             var isProtobuf = Formatter.GetType() == typeof(ProtoBufMediaTypeFormatter);
             var absoluteUrl = GetAbsoluteUrl(url);
@@ -104,32 +132,7 @@ namespace Byndyusoft.ApiClient
             var response = await Client.SendAsync(requestMessage, cancellationToken);
 
             response.EnsureSuccessStatusCode();
-            var result = await response
-                .Content
-                .ReadAsAsync<TResult>
-                (
-                    new[]
-                    {
-                        Formatter
-                    },
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
-            return result;
-        }
-
-        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
-        {
-            var type = content.GetType();
-            var requestMessage
-                = new HttpRequestMessage
-                  {
-                      Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = new ObjectContent(type, content, Formatter)
-                  };
-            var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+            return response;
         }
     }
 }

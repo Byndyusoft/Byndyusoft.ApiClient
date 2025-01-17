@@ -86,7 +86,6 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
     {
         var id = Interlocked.Increment(ref _idProvider);
         testOutputHelper.WriteLine($"id: {id}");
-        ListModel.Data.Add(id, new List<SimpleModel>());
 
         // Assert
         await Assert.ThrowsAsync<HttpRequestException>(
@@ -100,15 +99,16 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         var id = Interlocked.Increment(ref _idProvider);
         var cancel = CancellationToken.None;
         testOutputHelper.WriteLine($"id: {id}");
-        ListModel.Data.Add(id, new List<SimpleModel>());
         var input = SimpleModel.Create();
 
         // Act
+        await TestSubject.AddListAsync(id, cancel);
         var response = await TestSubject.PostModelToListAsync(id, input, cancel);
         response = await TestSubject.PutModelToListAsync(id, response, cancel);
         response = await TestSubject.PatchModelAtListAsync(id, response, cancel);
         response = await TestSubject.GetSingleFromListModelAsync(id, cancel);
         await TestSubject.DeleteFromListAsync(id, cancel);
+        await TestSubject.DeleteListAsync(id, cancel);
 
         // Assert
         Assert.NotNull(response);
@@ -123,12 +123,12 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         var id = Interlocked.Increment(ref _idProvider);
         var cancel = CancellationToken.None;
         testOutputHelper.WriteLine($"id: {id}");
-        ListModel.Data.Add(id, new List<SimpleModel>());
         var input = SimpleModel.Create();
         var length = 10_000;
         var stopwatch = new Stopwatch();
 
         // Act
+        await TestSubject.AddListAsync(id, cancel);
         stopwatch.Start();
         for (var i = 0; i < length; i++)
             await TestSubject.PostModelToListAsync(id, input, cancel);
@@ -140,7 +140,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         var response = await TestSubject.GetAllFromListModelAsync(id, cancel);
         stopwatch.Stop();
         testOutputHelper.WriteLine(stopwatch.Elapsed.ToString());
-        
+
         // Assert
         Assert.NotNull(response);
         var model = Assert.IsType<List<SimpleModel>>(response);
@@ -154,5 +154,6 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         }
         stopwatch.Stop();
         testOutputHelper.WriteLine(stopwatch.Elapsed.ToString());
+        await TestSubject.DeleteListAsync(id, cancel);
     }
 }

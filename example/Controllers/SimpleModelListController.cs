@@ -1,5 +1,6 @@
 ﻿namespace Byndyusoft.ApiClient.Controllers;
 
+using System.Collections.Generic;
 using System.Linq;
 using Byndyusoft.ApiClient.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,32 @@ using Microsoft.AspNetCore.Mvc;
 public class SimpleModelListController : ControllerBase
 {
     [HttpPost]
+    [Route("addList/{id}")]
+    [FormatFilter]
+    public IActionResult AddList(int id)
+    {
+        ListModel.Data.Add(id, new List<SimpleModel>());
+        return Ok();
+    }
+
+    [HttpDelete]
+    [Route("deleteList/{id}")]
+    [FormatFilter]
+    public IActionResult DeleteList(int id)
+    {
+        if (!ListModel.Data.ContainsKey(id))
+            return NotFound();
+        ListModel.Data.Remove(id);
+        return Ok();
+    }
+
+    [HttpPost]
     [Route("post/{id}")]
     [FormatFilter]
     public IActionResult Post([FromBody] SimpleModel model, int id)
     {
+        if(!ListModel.Data.ContainsKey(id))
+            return NotFound();
         ListModel.Data[id].Add(model);
         return Ok(model);
     }
@@ -22,7 +45,9 @@ public class SimpleModelListController : ControllerBase
     [FormatFilter]
     public IActionResult Put([FromBody] SimpleModel model, int id)
     {
-        if(ListModel.Data[id].Any())
+        if (!ListModel.Data.ContainsKey(id))
+            return NotFound();
+        if (ListModel.Data[id].Any())
             ListModel.Data[id].RemoveAt(ListModel.Data[id].Count - 1);
         ListModel.Data[id].Add(model);
         return Ok(model);
@@ -33,7 +58,9 @@ public class SimpleModelListController : ControllerBase
     [FormatFilter]
     public IActionResult Patch([FromBody] SimpleModel model, int id)
     {
-        if (ListModel.Data.Any())
+        if (!ListModel.Data.ContainsKey(id))
+            return NotFound();
+        if (ListModel.Data[id].Any())
         {
             ListModel.Data[id][^1] = model;
             return Ok(model);
@@ -46,7 +73,9 @@ public class SimpleModelListController : ControllerBase
     [FormatFilter]
     public IActionResult Get(int id)
     {
-        if(ListModel.Data[id].Any())
+        if (!ListModel.Data.ContainsKey(id))
+            return NotFound();
+        if (ListModel.Data[id].Any())
             return Ok(ListModel.Data[id].Last());
         return NotFound();
     }
@@ -56,7 +85,9 @@ public class SimpleModelListController : ControllerBase
     [FormatFilter]
     public IActionResult GetAll(int id)
     {
-        return Ok(ListModel.Data[id]);
+        if (!ListModel.Data.TryGetValue(id, out var value))
+            return NotFound();
+        return Ok(value);
     }
 
     [HttpDelete]
@@ -64,6 +95,8 @@ public class SimpleModelListController : ControllerBase
     [FormatFilter]
     public IActionResult Delete(int id)
     {
+        if (!ListModel.Data.ContainsKey(id))
+            return NotFound();
         if (ListModel.Data[id].Any())
         {
             ListModel.Data[id].RemoveAt(ListModel.Data[id].Count - 1);

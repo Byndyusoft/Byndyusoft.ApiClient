@@ -32,6 +32,12 @@ public class TestFormatterSimpleModelClient : BaseClient
     public Task<SimpleModel> GetWithParamsAsync(ParamsTestModel model, CancellationToken cancellationToken)
         => GetAsync<ParamsTestModel, SimpleModel>($"{SimpleModelPrefix}/with_params", model, cancellationToken);
 
+    public Task AddListAsync(int id, CancellationToken cancellationToken) =>
+        PostAsync($"{SimpleModelListPrefix}/addList/{id}", null, cancellationToken);
+
+    public Task DeleteListAsync(int id, CancellationToken cancellationToken) =>
+        DeleteAsync($"{SimpleModelListPrefix}/deleteList/{id}", cancellationToken);
+
     public Task<SimpleModel> GetSingleFromListModelAsync(int id, CancellationToken cancellationToken)
         => GetAsync<SimpleModel>($"{SimpleModelListPrefix}/get/{id}", cancellationToken);
 

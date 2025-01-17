@@ -41,7 +41,10 @@ public abstract class MvcTestFixture : IDisposable
         {
             if (_client == null)
             {
-                _client = new HttpClient {BaseAddress = new Uri(URL)};
+                _client = new HttpClient
+                          {
+                              BaseAddress = new Uri(URL),
+                          };
                 ConfigureHttpClient(_client);
             }
 

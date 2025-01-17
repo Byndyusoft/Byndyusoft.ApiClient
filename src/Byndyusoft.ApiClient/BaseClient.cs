@@ -94,8 +94,8 @@ namespace Byndyusoft.ApiClient
             return result;
         }
 
-        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken) =>
-            await CallAsyncBase(method, url, content, cancellationToken);
+        protected Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken) =>
+            CallAsyncBase(method, url, content, cancellationToken);
 
         private async Task<HttpResponseMessage> CallAsyncBase(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
@@ -107,22 +107,14 @@ namespace Byndyusoft.ApiClient
                   {
                       Method = method,
                       RequestUri = absoluteUri,
+                      Version = new Version(2, 0)
                   };
             if (content != null)
             {
                 var type = content.GetType();
                 var objContent = new ObjectContent(type, content, Formatter);
                 requestMessage.Content = objContent;
-                if (isProtobuf)
-                {
-                    var len = await objContent.ReadAsByteArrayAsync();
-                    requestMessage.Content.Headers.ContentLength = len.LongLength;
-                    requestMessage.Headers.TransferEncodingChunked = false;
-                }
             }
-
-            if (isProtobuf)
-                requestMessage.Version = new Version(1, 0);
 
             var response = await Client.SendAsync(requestMessage, cancellationToken);
 

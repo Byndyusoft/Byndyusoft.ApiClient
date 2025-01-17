@@ -11,6 +11,9 @@ using Models;
 
 public class TestFormatterSimpleModelClient : BaseClient
 {
+    private const string SimpleModelPrefix = "/SimpleModel";
+    private const string SimpleModelListPrefix = "/SimpleModelList";
+
     public TestFormatterSimpleModelClient(
             HttpClient client,
             MediaTypeFormatter formatter,
@@ -20,38 +23,30 @@ public class TestFormatterSimpleModelClient : BaseClient
 
 
     public Task<SimpleModel> GetModelAsync(CancellationToken cancellationToken)
-        => GetAsync<SimpleModel>("/SimpleModel/get", cancellationToken);
+        => GetAsync<SimpleModel>($"{SimpleModelPrefix}/get", cancellationToken);
+    public Task<SimpleModel> PostModelAsync(SimpleModel content, CancellationToken cancellationToken)
+        => PostAsync<SimpleModel>($"{SimpleModelPrefix}/post", content, cancellationToken);
+    public Task<SimpleModel> PutModelAsync(SimpleModel content, CancellationToken cancellationToken)
+        => PutAsync<SimpleModel>($"{SimpleModelPrefix}/put", content, cancellationToken);
 
     public Task<SimpleModel> GetWithParamsAsync(ParamsTestModel model, CancellationToken cancellationToken)
-        => GetAsync<ParamsTestModel, SimpleModel>("/SimpleModel/with_params", model, cancellationToken);
+        => GetAsync<ParamsTestModel, SimpleModel>($"{SimpleModelPrefix}/with_params", model, cancellationToken);
 
     public Task<SimpleModel> GetSingleFromListModelAsync(int id, CancellationToken cancellationToken)
-        => GetAsync<SimpleModel>($"/SimpleModelList/get/{id}", cancellationToken);
+        => GetAsync<SimpleModel>($"{SimpleModelListPrefix}/get/{id}", cancellationToken);
 
     public Task<List<SimpleModel>> GetAllFromListModelAsync(int id, CancellationToken cancellationToken)
-        => GetAsync<List<SimpleModel>>($"/SimpleModelList/getAll/{id}", cancellationToken);
+        => GetAsync<List<SimpleModel>>($"{SimpleModelListPrefix}/getAll/{id}", cancellationToken);
 
-    public Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
-        base.PostAsync(url, content, cancellationToken);
+    public Task<SimpleModel> PostModelToListAsync(int id, SimpleModel content, CancellationToken cancellationToken) =>
+        PostAsync<SimpleModel>($"{SimpleModelListPrefix}/post/{id}", content, cancellationToken);
 
-    public Task<TResult> PostAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
-        base.PostAsync<TResult>(url, content, cancellationToken);
+    public Task<SimpleModel> PutModelToListAsync(int id, SimpleModel content, CancellationToken cancellationToken) =>
+        PutAsync<SimpleModel>($"{SimpleModelListPrefix}/put/{id}", content, cancellationToken);
 
-    public Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
-        base.PutAsync<TResult>(url, content, cancellationToken);
+    public Task<SimpleModel> PatchModelAtListAsync(int id, SimpleModel content, CancellationToken cancellationToken) =>
+        PatchAsync<SimpleModel>($"{SimpleModelListPrefix}/patch/{id}", content, cancellationToken);
 
-    public Task PutAsync(string url, object content, CancellationToken cancellationToken) =>
-        base.PutAsync(url, content, cancellationToken);
-
-    public Task<TResult> PatchAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
-        base.PatchAsync<TResult>(url, content, cancellationToken);
-
-    public Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
-        base.PatchAsync(url, content, cancellationToken);
-
-    public Task DeleteAsync(string url, CancellationToken cancellationToken) =>
-        base.DeleteAsync(url, cancellationToken);
-
-    public Task DeleteAsync<TParams>(string url, TParams parameters, CancellationToken cancellationToken) =>
-        base.DeleteAsync(url, parameters, cancellationToken);
+    public Task DeleteFromListAsync(int id, CancellationToken cancellationToken) =>
+        DeleteAsync($"{SimpleModelListPrefix}/delete/{id}", cancellationToken);
 }

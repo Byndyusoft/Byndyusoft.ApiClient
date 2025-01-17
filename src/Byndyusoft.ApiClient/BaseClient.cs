@@ -74,10 +74,7 @@ namespace Byndyusoft.ApiClient
         protected Task DeleteAsync<TParams>(string url, TParams parameters, CancellationToken cancellationToken) =>
             CallAsync(HttpMethod.Delete, url, parameters, cancellationToken);
 
-        protected string GetAbsoluteUrl(string url)
-        {
-            return $"{ApiSettings.ConnectionString}{url}";
-        }
+        protected string GetAbsoluteUrl(string url) => $"{ApiSettings.ConnectionString}{url}";
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
@@ -97,10 +94,8 @@ namespace Byndyusoft.ApiClient
             return result;
         }
 
-        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
-        {
+        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken) =>
             await CallAsyncBase(method, url, content, cancellationToken);
-        }
 
         private async Task<HttpResponseMessage> CallAsyncBase(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {

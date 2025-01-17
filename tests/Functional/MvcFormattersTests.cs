@@ -2,12 +2,11 @@ namespace Byndyusoft.ApiClient.Functional;
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using ApiClient.Models;
 using Client;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +22,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         var input = SimpleModel.Create();
 
         // Act
-        var response = await TestSubject.PostAsync<SimpleModel>("/formatter/post", input, CancellationToken.None);
+        var response = await TestSubject.PostModelAsync(input, CancellationToken.None);
             
         // Assert
         Assert.NotNull(response);
@@ -39,7 +38,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         var input = SimpleModel.Create();
 
         // Act
-        var response = await TestSubject.PutAsync<SimpleModel>("/formatter/put", input, CancellationToken.None);
+        var response = await TestSubject.PutModelAsync(input, CancellationToken.None);
 
         // Assert
         Assert.NotNull(response);
@@ -73,6 +72,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
 
         // Act
         var response = await TestSubject.GetWithParamsAsync(input, CancellationToken.None);
+
         // Assert
         Assert.NotNull(response);
         var model = Assert.IsType<SimpleModel>(response);
@@ -87,12 +87,10 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         var id = Interlocked.Increment(ref _idProvider);
         testOutputHelper.WriteLine($"id: {id}");
         ListModel.Data.Add(id, new List<SimpleModel>());
+
         // Assert
-        await Assert.ThrowsAsync<HttpRequestWithContentException>(
-            async () => 
-                await TestSubject.DeleteAsync(
-            $"/formatter/list/delete/{id}",
-            CancellationToken.None));
+        await Assert.ThrowsAsync<HttpRequestException>(
+            async () => await TestSubject.DeleteFromListAsync(id, CancellationToken.None));
     }
 
     [Fact]
@@ -100,35 +98,17 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
     {
         // Arrange
         var id = Interlocked.Increment(ref _idProvider);
+        var cancel = CancellationToken.None;
         testOutputHelper.WriteLine($"id: {id}");
         ListModel.Data.Add(id, new List<SimpleModel>());
         var input = SimpleModel.Create();
 
         // Act
-        var response = await TestSubject.PostAsync<SimpleModel>
-        (
-            $"/formatter/list/post/{id}",
-            input,
-            CancellationToken.None
-        );
-        response = await TestSubject.PutAsync<SimpleModel>
-        (
-            $"/formatter/list/put/{id}",
-            response,
-            CancellationToken.None
-        );
-        response = await TestSubject.PatchAsync<SimpleModel>
-        (
-            $"/formatter/list/patch/{id}",
-            response,
-            CancellationToken.None
-        );
-        response = await TestSubject.GetSingleFromListModelAsync(id, CancellationToken.None);
-        await TestSubject.DeleteAsync
-        (
-            $"/formatter/list/delete/{id}",
-            CancellationToken.None
-        );
+        var response = await TestSubject.PostModelToListAsync(id, input, cancel);
+        response = await TestSubject.PutModelToListAsync(id, response, cancel);
+        response = await TestSubject.PatchModelAtListAsync(id, response, cancel);
+        response = await TestSubject.GetSingleFromListModelAsync(id, cancel);
+        await TestSubject.DeleteFromListAsync(id, cancel);
 
         // Assert
         Assert.NotNull(response);
@@ -141,29 +121,23 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
     {
         // Arrange
         var id = Interlocked.Increment(ref _idProvider);
+        var cancel = CancellationToken.None;
         testOutputHelper.WriteLine($"id: {id}");
         ListModel.Data.Add(id, new List<SimpleModel>());
         var input = SimpleModel.Create();
         var length = 10_000;
         var stopwatch = new Stopwatch();
-        stopwatch.Start();
 
         // Act
+        stopwatch.Start();
         for (var i = 0; i < length; i++)
-        {
-            await TestSubject.PostAsync
-            (
-                $"/formatter/list/post/{id}",
-                input,
-                CancellationToken.None
-            );
-        }
+            await TestSubject.PostModelToListAsync(id, input, cancel);
         stopwatch.Stop();
         testOutputHelper.WriteLine(stopwatch.Elapsed.ToString());
 
         stopwatch.Reset();
         stopwatch.Start();
-        var response = await TestSubject.GetAllFromListModelAsync(id, CancellationToken.None);
+        var response = await TestSubject.GetAllFromListModelAsync(id, cancel);
         stopwatch.Stop();
         testOutputHelper.WriteLine(stopwatch.Elapsed.ToString());
         
@@ -176,7 +150,7 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         stopwatch.Start();
         for (var i = 0; i < length; i++)
         {
-            await TestSubject.DeleteAsync($"/formatter/list/delete/{id}", CancellationToken.None);
+            await TestSubject.DeleteFromListAsync(id, CancellationToken.None);
         }
         stopwatch.Stop();
         testOutputHelper.WriteLine(stopwatch.Elapsed.ToString());

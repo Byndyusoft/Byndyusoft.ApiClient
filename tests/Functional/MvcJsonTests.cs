@@ -21,13 +21,13 @@ public class MvcJsonTests : MvcFormattersTests
     {
         TestSubject = new TestFormatterSimpleModelClient(
             Client,
-            new JsonMediaTypeFormatter(_serializerOptions),
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings
                 {
                     ConnectionString = URL
                 }
-            )
+            ),
+            new JsonMediaTypeFormatter(_serializerOptions)
         );
     }
 

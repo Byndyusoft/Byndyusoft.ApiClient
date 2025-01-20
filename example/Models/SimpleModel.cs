@@ -9,9 +9,9 @@ using ProtoBuf;
 [ProtoContract]
 public class SimpleModel
 {
-    [ProtoMember(1)] public int Property { get; set; }
+    [ProtoMember(1)] public int PropertyForCaseTesting { get; set; }
 
-    [ProtoMember(2)][JsonInclude]  public string Field = default!;
+    [ProtoMember(2)][JsonInclude]  public string FieldForCaseTesting = default!;
 
     [ProtoMember(3)] public SeekOrigin Enum { get; set; }
 
@@ -28,9 +28,9 @@ public class SimpleModel
     {
         return new()
                {
-                   Property = property,
+                   PropertyForCaseTesting = property,
                    Enum = SeekOrigin.Current,
-                   Field = field,
+                   FieldForCaseTesting = field,
                    Array = [1, 2],
                    Nullable = nullable
                };
@@ -50,8 +50,8 @@ public class SimpleModel
     protected bool Equals(SimpleModel other)
     {
         return
-            Property == other.Property
-            && Field.Equals(other.Field, StringComparison.InvariantCulture)
+            PropertyForCaseTesting == other.PropertyForCaseTesting
+            && string.Equals(FieldForCaseTesting, FieldForCaseTesting, StringComparison.InvariantCulture)
             && Enum == other.Enum
             && System.Nullable.Equals(Nullable, other.Nullable)
             && Array.SequenceEqual(other.Array);
@@ -59,6 +59,6 @@ public class SimpleModel
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Field, Property, (int)Enum, Nullable, Array);
+        return HashCode.Combine(FieldForCaseTesting, PropertyForCaseTesting, (int)Enum, Nullable, Array);
     }
 }

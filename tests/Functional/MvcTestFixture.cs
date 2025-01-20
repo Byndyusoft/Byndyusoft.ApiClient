@@ -9,6 +9,7 @@ using System.Reflection;
 using Byndyusoft.ApiClient.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -27,6 +28,7 @@ public abstract class MvcTestFixture : IDisposable
                     webBuilder =>
                     {
                         webBuilder.UseUrls(URL);
+                        webBuilder.UseTestServer();
                         webBuilder.ConfigureServices(ConfigureServices);
                         webBuilder.Configure(Configure);
                     }
@@ -63,13 +65,13 @@ public abstract class MvcTestFixture : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public void Configure(IApplicationBuilder app)
+    public virtual void Configure(IApplicationBuilder app)
     {
         app.UseRouting();
         app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 
-    public void ConfigureServices(IServiceCollection services)
+    public virtual void ConfigureServices(IServiceCollection services)
     {
         services.AddLogging(c => c.ClearProviders());
         services.AddControllers();

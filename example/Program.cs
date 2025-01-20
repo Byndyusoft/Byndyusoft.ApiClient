@@ -1,8 +1,14 @@
+using System.Net.Http;
+using System.Net.Http.Json.Formatting;
 using Asp.Versioning;
+using Byndyusoft.ApiClient;
+using Byndyusoft.ApiClient.Client;
+using Byndyusoft.ApiClient.Contracts;
 using Byndyusoft.ApiClient.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -32,6 +38,23 @@ services
     .AddMessagePackFormatters()
     .AddFormatterMappings();
 services.AddControllers();
+
+services
+    .AddOptions()
+    .Configure<ApiClientSettings>(builder.Configuration.GetSection(nameof(ApiClientSettings)));
+
+services.AddHttpClient<ISimpleModelClient, TestFormatterSimpleModelClient>(
+    client =>
+        new TestFormatterSimpleModelClient(
+            client,
+            Options.Create(
+                new ApiClientSettings
+                {
+                    ConnectionString = client.BaseAddress?.AbsolutePath ?? "http://localhost:5000"
+                }
+            )
+        )
+    );
 
 var app = builder.Build();
 

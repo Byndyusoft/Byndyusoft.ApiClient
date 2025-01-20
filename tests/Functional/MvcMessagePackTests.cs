@@ -18,13 +18,13 @@ public class MvcMessagePackTests : MvcFormattersTests
         _serializerOptions = MessagePackDefaults.SerializerOptions;
         TestSubject = new TestFormatterSimpleModelClient(
             Client,
-            new MessagePackMediaTypeFormatter(_serializerOptions),
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings
                 {
                     ConnectionString = URL
                 }
-            )
+            ),
+            new MessagePackMediaTypeFormatter(_serializerOptions)
         );
     }
 

@@ -18,13 +18,13 @@ public class MvcProtobufTests : MvcFormattersTests
         _typeModel = ProtoBufDefaults.TypeModel;
         TestSubject = new TestFormatterSimpleModelClient(
             Client,
-            new ProtoBufMediaTypeFormatter(_typeModel),
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings
                 {
                     ConnectionString = URL
                 }
-            )
+            ),
+            new ProtoBufMediaTypeFormatter(_typeModel)
         );
     }
 

@@ -44,7 +44,7 @@ public class FormatterProvider : IFormatterProvider
 	public readonly MediaTypeFormatter Formatter { get; }
 	public FormatterProvider()
 	{
-        ...
+		...
 	}
 }
 ```

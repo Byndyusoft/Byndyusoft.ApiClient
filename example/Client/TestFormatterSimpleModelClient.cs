@@ -2,11 +2,11 @@ namespace Byndyusoft.ApiClient.Client;
 
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
-using Byndyusoft.ApiClient;
-using Byndyusoft.ApiClient.Contracts;
+using ApiClient;
+using Contracts;
+using Interfaces;
 using Microsoft.Extensions.Options;
 using Models;
 
@@ -18,9 +18,9 @@ public class TestFormatterSimpleModelClient : BaseClient, ISimpleModelClient, IS
     public TestFormatterSimpleModelClient(
             HttpClient client,
             IOptions<ApiClientSettings> apiSettings,
-            MediaTypeFormatter formatter = null
+            IFormatterProvider formatterProvider = null
         )
-        : base(client, apiSettings, formatter) { }
+        : base(client, apiSettings, formatterProvider) { }
 
 
     public Task<SimpleModel> GetModelAsync(CancellationToken cancellationToken)

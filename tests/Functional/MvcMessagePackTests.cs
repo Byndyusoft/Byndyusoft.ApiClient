@@ -24,7 +24,7 @@ public class MvcMessagePackTests : MvcFormattersTests
                     ConnectionString = URL
                 }
             ),
-            new MessagePackMediaTypeFormatter(_serializerOptions)
+            new TestFormatterProvider(new MessagePackMediaTypeFormatter(_serializerOptions))
         );
     }
 

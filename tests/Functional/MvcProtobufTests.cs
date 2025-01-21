@@ -2,8 +2,8 @@ namespace Byndyusoft.ApiClient.Functional;
 
 using System.Net.Http;
 using System.Net.Http.ProtoBuf;
-using System.Net.Http.ProtoBuf.Formatting;
 using Client;
+using Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ProtoBuf.Meta;
@@ -11,11 +11,10 @@ using Xunit.Abstractions;
 
 public class MvcProtobufTests : MvcFormattersTests
 {
-    private readonly TypeModel _typeModel;
+    private readonly TypeModel _typeModel= ProtoBufDefaults.TypeModel;
 
     public MvcProtobufTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
     {
-        _typeModel = ProtoBufDefaults.TypeModel;
         TestSubject = new TestFormatterSimpleModelClient(
             Client,
             new OptionsWrapper<ApiClientSettings>(
@@ -24,7 +23,7 @@ public class MvcProtobufTests : MvcFormattersTests
                     ConnectionString = URL
                 }
             ),
-            new ProtoBufMediaTypeFormatter(_typeModel)
+            new PrfotoBufFormatterProvider()
         );
     }
 

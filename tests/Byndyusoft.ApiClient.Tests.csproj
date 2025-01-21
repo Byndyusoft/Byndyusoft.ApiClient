@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\example\Byndyusoft.ApiClient.Example.csproj" />
-    <ProjectReference Include="..\src\Byndyusoft.ApiClient\Byndyusoft.ApiClient.csproj" />
   </ItemGroup>
 
 </Project>

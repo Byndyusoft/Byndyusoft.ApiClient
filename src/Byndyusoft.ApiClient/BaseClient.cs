@@ -6,9 +6,9 @@ namespace Byndyusoft.ApiClient
     using System.Net.Http.Headers;
     using System.Net.Http.Json;
     using System.Net.Http.Json.Formatting;
-    using System.Net.Http.ProtoBuf.Formatting;
     using System.Threading;
     using System.Threading.Tasks;
+    using Interfaces;
     using Microsoft.Extensions.Options;
 
     public class BaseClient
@@ -21,12 +21,12 @@ namespace Byndyusoft.ApiClient
         (
             HttpClient client,
             IOptions<ApiClientSettings> apiSettings,
-            MediaTypeFormatter? formatter = null
+            IFormatterProvider? formatter = null
         )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
             ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
-            Formatter = formatter ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
+            Formatter = formatter?.Formatter ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
             foreach (var mediaTypeHeaderValue in Formatter.SupportedMediaTypes)
                 Client.DefaultRequestHeaders.Accept.Add
                 (
@@ -99,7 +99,6 @@ namespace Byndyusoft.ApiClient
 
         private async Task<HttpResponseMessage> CallAsyncBase(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
-            var isProtobuf = Formatter.GetType() == typeof(ProtoBufMediaTypeFormatter);
             var absoluteUrl = GetAbsoluteUrl(url);
             var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
             var requestMessage

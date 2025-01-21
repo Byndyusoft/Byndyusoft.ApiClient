@@ -4,6 +4,8 @@ using Asp.Versioning;
 using Byndyusoft.ApiClient;
 using Byndyusoft.ApiClient.Client;
 using Byndyusoft.ApiClient.Contracts;
+using Byndyusoft.ApiClient.Infrastructure;
+using Byndyusoft.ApiClient.Interfaces;
 using Byndyusoft.ApiClient.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,18 +45,9 @@ services
     .AddOptions()
     .Configure<ApiClientSettings>(builder.Configuration.GetSection(nameof(ApiClientSettings)));
 
-services.AddHttpClient<ISimpleModelClient, TestFormatterSimpleModelClient>(
-    client =>
-        new TestFormatterSimpleModelClient(
-            client,
-            Options.Create(
-                new ApiClientSettings
-                {
-                    ConnectionString = client.BaseAddress?.AbsolutePath ?? "http://localhost:5000"
-                }
-            )
-        )
-    );
+services.AddTransient<IFormatterProvider, PrfotoBufFormatterProvider>();
+services.AddHttpClient<ISimpleModelClient, TestFormatterSimpleModelClient>();
+services.AddHttpClient<ISimpleModelListClient, TestFormatterSimpleModelClient>();
 
 var app = builder.Build();
 

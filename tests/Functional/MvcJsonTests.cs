@@ -26,8 +26,7 @@ public class MvcJsonTests : MvcFormattersTests
                 {
                     ConnectionString = URL
                 }
-            ),
-            new JsonMediaTypeFormatter(_serializerOptions)
+            )
         );
     }
 

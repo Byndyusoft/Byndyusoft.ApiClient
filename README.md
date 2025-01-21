@@ -16,27 +16,18 @@ dotnet add package Byndyusoft.ApiClient
 ## Usage
 To create an API client:
 1. Create your API client class and derive it from BaseClient class:
-```
+```csharp
 public class SomeApiClient : BaseClient
 {
-	public SomeApiClient(HttpClient client, IOptions<ApiClientSettings> apiSettings) : base(client, apiSettings)
+	public SomeApiClient(HttpClient client, IOptions<ApiClientSettings> apiSettings, IFormatterProvider formatterProvider) : base(client, apiSettings, formatterProvider)
 	{
 	}
 }
 ```
-or create your API client class and derive it from FormatterClient class:
-```
-public class SomeApiClient : FormatterClient
-{
-	public SomeApiClient(HttpClient client, MediaTypeFormatter formatter, IOptions<ApiClientSettings> apiSettings) : base(client, formatter, apiSettings)
-	{
-	}
-}
-```
-Json, MessagePack or ProtoBuf MediaTypeFormatters are supported currently with Byndyusoft.Net.Http.Json, Byndyusoft.Net.Http.MessagePack and Byndyusoft.Net.Http.ProtoBuf packages
+Json, MessagePack or ProtoBuf MediaTypeFormatters are supported currently 
 
 2. Great! Now you can use the BaseClient methods to declare your methods:
-```
+```csharp
 public Task<Model> Create(CreateModelRequest createModelRequest)
 	=> PostAsync<Model>("api/create", createModelRequest);
 			
@@ -46,8 +37,20 @@ public Task Delete(int id)
 public Task<Model> Get(GetModelRequest getModelRequest) =>
 	=> GetAsync<GetModelRequest, Model>("api/get, getModelRequest);
 ```
-3.  Make sure to register your client wherever you need it:
+3. If you want your messages to have some specific format implement `IFormatterProvider`:
+```csharp
+public class FormatterProvider : IFormatterProvider
+{
+	public readonly MediaTypeFormatter Formatter { get; }
+	public FormatterProvider()
+	{
+        ...
+	}
+}
 ```
+4.  Make sure to register your client wherever you need it:
+```csharp
+serviceCollection..AddTransient<IFormatterProvider, FormatterProvider>();
 serviceCollection.AddHttpClient<SomeApiClient>();
 ```
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Tests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example", "example\Byndyusoft.ApiClient.Example.csproj", "{D3BAEB82-7CEE-41C6-9368-94410FB532D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Benchmark", "Byndyusoft.ApiClient.Benchmark\Byndyusoft.ApiClient.Benchmark.csproj", "{75652FC0-4496-4EC4-BA8E-617AE05CFC30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{D3BAEB82-7CEE-41C6-9368-94410FB532D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3BAEB82-7CEE-41C6-9368-94410FB532D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3BAEB82-7CEE-41C6-9368-94410FB532D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

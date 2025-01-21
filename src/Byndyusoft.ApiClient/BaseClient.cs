@@ -8,7 +8,6 @@ namespace Byndyusoft.ApiClient
     using System.Net.Http.Json.Formatting;
     using System.Threading;
     using System.Threading.Tasks;
-    using Interfaces;
     using Microsoft.Extensions.Options;
 
     public class BaseClient
@@ -21,12 +20,12 @@ namespace Byndyusoft.ApiClient
         (
             HttpClient client,
             IOptions<ApiClientSettings> apiSettings,
-            IFormatterProvider? formatter = null
+            IOptions<MediaTypeFormatter>? formatter = null
         )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
             ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
-            Formatter = formatter?.Formatter ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
+            Formatter = formatter?.Value ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
             foreach (var mediaTypeHeaderValue in Formatter.SupportedMediaTypes)
                 Client.DefaultRequestHeaders.Accept.Add
                 (

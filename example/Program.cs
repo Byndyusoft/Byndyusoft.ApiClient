@@ -45,7 +45,6 @@ services
     .AddOptions()
     .Configure<ApiClientSettings>(builder.Configuration.GetSection(nameof(ApiClientSettings)));
 
-services.AddTransient<IFormatterProvider, PrfotoBufFormatterProvider>();
 services.AddHttpClient<ISimpleModelClient, TestFormatterSimpleModelClient>();
 services.AddHttpClient<ISimpleModelListClient, TestFormatterSimpleModelClient>();
 

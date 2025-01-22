@@ -13,17 +13,17 @@ public class PersonModel
 
     [ProtoMember(2)][JsonInclude] public string? LastName = null;
 
-    [ProtoMember(2)] public DateTime? DateOfBirth { get; set; }
+    [ProtoMember(3)] public DateTime? DateOfBirth { get; set; }
 
-    [ProtoMember(3)] public bool? IsMarried { get; set; }
+    [ProtoMember(4)] public bool? IsMarried { get; set; }
 
-    [ProtoMember(4)] public FavoriteDessertEnum? FavoriteDessert { get; set; }
+    [ProtoMember(5)] public FavoriteDessertEnum? FavoriteDessert { get; set; }
 
-    [ProtoMember(5)] public ulong? Id { get; set; }
+    [ProtoMember(6)] public ulong? Id { get; set; }
 
-    [ProtoMember(6)] public ulong? DriverLicenseId { get; set; }
+    [ProtoMember(7)] public ulong? DriverLicenseId { get; set; }
 
-    [ProtoMember(7)] public string[]? ChildrenNames { get; set; }
+    [ProtoMember(8)] public string[]? ChildrenNames { get; set; }
 
     public PersonModel(
         string? firstName = null,
@@ -43,6 +43,18 @@ public class PersonModel
         Id = id;
         DriverLicenseId = driverLicenseId;
         ChildrenNames = childrenNames;
+    }
+
+    public PersonModel()
+    {
+        FirstName = null;
+        LastName = null;
+        DateOfBirth = null;
+        IsMarried = null;
+        FavoriteDessert = null;
+        Id = null;
+        DriverLicenseId = null;
+        ChildrenNames = null;
     }
 
     public static PersonModel Create() => new(

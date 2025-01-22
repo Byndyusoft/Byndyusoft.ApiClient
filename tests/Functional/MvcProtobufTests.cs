@@ -6,7 +6,9 @@ using System.Net.Http.ProtoBuf.Formatting;
 using Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Models;
 using ProtoBuf.Meta;
+using Xunit;
 using Xunit.Abstractions;
 
 public class MvcProtobufTests : MvcFormattersTests
@@ -36,5 +38,13 @@ public class MvcProtobufTests : MvcFormattersTests
     {
         builder
             .AddProtoBufNet(options => { options.Model = _typeModel; });
+    }
+
+    [Fact]
+    public void ExpectPersonModelSerializedTest()
+    {
+        var formatter = new ProtoBufMediaTypeFormatter(ProtoBufDefaults.TypeModel);
+        Assert.True(formatter.CanReadType(typeof(PersonModel)));
+        Assert.True(formatter.CanWriteType(typeof(PersonModel)));
     }
 }

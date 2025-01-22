@@ -40,8 +40,6 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         await TestSubject.AddListAsync(id, cancel);
         var response = await TestSubject.AddPersonAsync(id, input, cancel);
         var personId = new PersonId(id, response.Id!.Value);
-        var a = _host.Services.GetService<IActionDescriptorCollectionProvider>();
-        var b = a.ActionDescriptors.Items.Where(ad => ad.AttributeRouteInfo != null).ToArray();
         response = await TestSubject.GetPersonAsync(personId, cancel);
         personId = new PersonId(id, response.Id!.Value);
         await TestSubject.DeletePersonAsync(personId, cancel);

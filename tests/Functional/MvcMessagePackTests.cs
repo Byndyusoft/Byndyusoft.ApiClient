@@ -16,7 +16,7 @@ public class MvcMessagePackTests : MvcFormattersTests
     public MvcMessagePackTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
     {
         _serializerOptions = MessagePackDefaults.SerializerOptions;
-        TestSubject = new TestFormatterSimpleModelClient(
+        TestSubject = new PersonModelListClient(
             Client,
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings
@@ -24,7 +24,7 @@ public class MvcMessagePackTests : MvcFormattersTests
                     ConnectionString = URL
                 }
             ),
-            new TestFormatterProvider(new MessagePackMediaTypeFormatter(_serializerOptions))
+            Options.Create(new MessagePackMediaTypeFormatter(_serializerOptions))
         );
     }
 

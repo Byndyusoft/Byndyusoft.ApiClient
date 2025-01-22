@@ -39,11 +39,11 @@ namespace Byndyusoft.ApiClient
         protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken) =>
             await CallAsync<TResult>(HttpMethod.Get, url, null, cancellationToken);
 
-        protected async Task<TResult> GetAsync<TParams, TResult>(string url, TParams? dto, CancellationToken cancellationToken)
+        protected async Task<TResult> GetAsync<TParams, TResult>(string url, TParams? parameters, CancellationToken cancellationToken)
             where TParams : class
         {
-            var httpQuery = dto != null
-                ? $"{url}?{HttpGetParamsBuilder.Build(dto)}"
+            var httpQuery = parameters != null
+                ? $"{url}?{HttpGetParamsBuilder.Build(parameters)}"
                 : url;
             var result = await CallAsync<TResult>(HttpMethod.Get, httpQuery, null, cancellationToken).ConfigureAwait(false);
             return result;
@@ -70,8 +70,14 @@ namespace Byndyusoft.ApiClient
         protected Task DeleteAsync(string url, CancellationToken cancellationToken) =>
             CallAsync(HttpMethod.Delete, url, null, cancellationToken);
 
-        protected Task DeleteAsync<TParams>(string url, TParams parameters, CancellationToken cancellationToken) =>
-            CallAsync(HttpMethod.Delete, url, parameters, cancellationToken);
+        protected async Task DeleteAsync<TParams>(string url, TParams? parameters, CancellationToken cancellationToken)
+            where TParams : class
+        {
+            var httpQuery = parameters != null
+                ? $"{url}?{HttpGetParamsBuilder.Build(parameters)}"
+                : url;
+            await CallAsync(HttpMethod.Delete, httpQuery, null, cancellationToken).ConfigureAwait(false);
+        }
 
         protected string GetAbsoluteUrl(string url) => $"{ApiSettings.ConnectionString}{url}";
 
@@ -105,7 +111,6 @@ namespace Byndyusoft.ApiClient
                   {
                       Method = method,
                       RequestUri = absoluteUri,
-                      Version = new Version(2, 0)
                   };
             if (content != null)
             {

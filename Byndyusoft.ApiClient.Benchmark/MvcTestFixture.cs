@@ -73,7 +73,7 @@ public abstract class MvcTestFixture : IDisposable
     {
         services.AddLogging(c => c.ClearProviders());
         services.AddControllers();
-        var assembly = Assembly.GetAssembly(typeof(SimpleModelController));
+        var assembly = Assembly.GetAssembly(typeof(PersonModelListController));
         ConfigureMvc(
             services
                 .AddMvcCore()

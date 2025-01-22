@@ -19,7 +19,7 @@ public class MvcJsonTests : MvcFormattersTests
 
     public MvcJsonTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
-        TestSubject = new TestFormatterSimpleModelClient(
+        TestSubject = new PersonModelListClient(
             Client,
             new OptionsWrapper<ApiClientSettings>(
                 new ApiClientSettings

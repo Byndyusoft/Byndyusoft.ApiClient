@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
-using Byndyusoft.ApiClient.Controllers;
+using Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -73,7 +73,7 @@ public abstract class MvcTestFixture : IDisposable
     {
         services.AddLogging(c => c.ClearProviders());
         services.AddControllers();
-        var assembly = Assembly.GetAssembly(typeof(SimpleModelController));
+        var assembly = Assembly.GetAssembly(typeof(PersonModelListController));
         ConfigureMvc(
             services
                 .AddMvcCore()

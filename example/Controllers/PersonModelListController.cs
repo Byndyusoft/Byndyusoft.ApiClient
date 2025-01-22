@@ -1,0 +1,133 @@
+﻿namespace Byndyusoft.ApiClient.Controllers;
+
+using System.Collections.Generic;
+using System.Linq;
+using Contracts;
+using Models;
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("[controller]")]
+public class PersonModelListController : ControllerBase
+{
+    [HttpPost]
+    [Route(PersonModelListRoutes.AddListCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult AddList(int id)
+    {
+        PersonModelList.Data.Add(id, new Dictionary<ulong, PersonModel>());
+        return Ok();
+    }
+
+    [HttpDelete]
+    [Route(PersonModelListRoutes.DeleteListCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult DeleteList(int id)
+    {
+        if (!PersonModelList.Data.ContainsKey(id))
+            return NotFound();
+        PersonModelList.Data.Remove(id);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Route(PersonModelListRoutes.AddPersonCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult AddPerson([FromBody] PersonModel model, int id)
+    {
+        if(!PersonModelList.Data.ContainsKey(id))
+            return NotFound();
+        if (!model.Id.HasValue)
+            return BadRequest();
+        if (!PersonModelList.Data[id].TryAdd(model.Id.Value, model))
+            return new ConflictResult();
+        return Ok(model);
+    }
+
+    [HttpPut]
+    [Route(PersonModelListRoutes.ReplacePersonCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult ReplacePerson([FromBody] PersonModel model, int id)
+    {
+        if (!PersonModelList.Data.ContainsKey(id))
+            return NotFound($"No data found by id: {id}");
+        if (!model.Id.HasValue)
+            return BadRequest();
+        var personId = model.Id.Value;
+        if (!PersonModelList.Data[id].ContainsKey(personId))
+            return NotFound($"No person found by id: {personId}");
+        PersonModelList.Data[id][personId] = model;
+        return Ok(model);
+    }
+
+    [HttpPatch]
+    [Route(PersonModelListRoutes.UpdatePersonCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult UpdatePerson([FromBody] PersonModel model, int id)
+    {
+        if (!PersonModelList.Data.ContainsKey(id) || !PersonModelList.Data[id].Any())
+            return NotFound($"No data found by id: {id}");
+        var personList = PersonModelList.Data[id];
+        if (!model.Id.HasValue)
+            return BadRequest();
+        var personId = model.Id.Value;
+        if (!personList.TryGetValue(personId, out var person))
+            return NotFound($"No person found by id: {personId}");
+        if (!string.IsNullOrEmpty(model.FirstName))
+            person.FirstName = model.FirstName;
+        if (!string.IsNullOrEmpty(model.LastName))
+            person.LastName = model.LastName;
+        if (model.DateOfBirth.HasValue)
+            person.DateOfBirth = model.DateOfBirth;
+        if (model.DriverLicenseId.HasValue)
+            person.DriverLicenseId = model.DriverLicenseId;
+        if (model.IsMarried.HasValue)
+            person.IsMarried = model.IsMarried;
+        if (model.ChildrenNames != null)
+            person.ChildrenNames = model.ChildrenNames;
+        return Ok(person);
+    }
+
+    [HttpGet]
+    [Route(PersonModelListRoutes.GetPersonCmd)]
+    [FormatFilter]
+    public IActionResult GetPerson(
+        [FromQuery] int listId,
+        [FromQuery] ulong id
+    )
+    {
+        if (!PersonModelList.Data.ContainsKey(listId) || !PersonModelList.Data[listId].Any())
+            return NotFound($"No data found by id: {id}");
+        var personList = PersonModelList.Data[listId];
+        if (!personList.TryGetValue(id, out var person))
+            return NotFound($"No person found by id: {id}");
+        return Ok(person);
+    }
+
+    [HttpGet]
+    [Route(PersonModelListRoutes.GetPersonListCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult GetEveryPerson(int id)
+    {
+        if (!PersonModelList.Data.TryGetValue(id, out var value))
+            return NotFound();
+        return Ok(value);
+    }
+
+    [HttpDelete]
+    [Route(PersonModelListRoutes.DeletePersonCmd)]
+    [FormatFilter]
+    public IActionResult RemovePerson(
+        [FromQuery] int listId,
+        [FromQuery] ulong id
+    )
+    {
+        if (!PersonModelList.Data.ContainsKey(listId) || !PersonModelList.Data[listId].Any())
+            return NotFound($"No data found by id: {id}");
+        var personList = PersonModelList.Data[listId];
+        if (!personList.ContainsKey(id))
+            return NotFound($"No person found by id: {id}");
+        personList.Remove(id);
+        return Ok();
+    }
+}

@@ -1,16 +1,11 @@
-using System.Net.Http;
-using System.Net.Http.Json.Formatting;
 using Asp.Versioning;
 using Byndyusoft.ApiClient;
 using Byndyusoft.ApiClient.Client;
 using Byndyusoft.ApiClient.Contracts;
-using Byndyusoft.ApiClient.Infrastructure;
-using Byndyusoft.ApiClient.Interfaces;
 using Byndyusoft.ApiClient.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -45,8 +40,7 @@ services
     .AddOptions()
     .Configure<ApiClientSettings>(builder.Configuration.GetSection(nameof(ApiClientSettings)));
 
-services.AddHttpClient<ISimpleModelClient, TestFormatterSimpleModelClient>();
-services.AddHttpClient<ISimpleModelListClient, TestFormatterSimpleModelClient>();
+services.AddHttpClient<IPersonModelListClient, PersonModelListClient>();
 
 var app = builder.Build();
 

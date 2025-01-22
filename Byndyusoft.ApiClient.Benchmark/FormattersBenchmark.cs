@@ -17,16 +17,15 @@ using BenchmarkDotNet.Engines;
 using Client;
 using Models;
 using Functional;
-using Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Net.Http.ProtoBuf.Formatting;
 
 [SimpleJob(RunStrategy.Throughput)]
 [AllStatisticsColumn]
 public class FormattersBenchmark : MvcTestFixture
 {
-    private BenchmarkData _benchmarkData;
-    protected TestFormatterSimpleModelClient TestSubject;
+    protected PersonModelListClient TestSubject;
     private static int _idProvider = 0;
     
     [GlobalSetup]
@@ -36,7 +35,7 @@ public class FormattersBenchmark : MvcTestFixture
         switch (DataType)
         {
             case BenchmarkDataType.ProtoBuf:
-                TestSubject = new TestFormatterSimpleModelClient(
+                TestSubject = new PersonModelListClient(
                     Client,
                     new OptionsWrapper<ApiClientSettings>(
                         new ApiClientSettings
@@ -44,11 +43,11 @@ public class FormattersBenchmark : MvcTestFixture
                             ConnectionString = Client.BaseAddress!.AbsoluteUri,
                         }
                     ),
-                    new PrfotoBufFormatterProvider()
+                    Options.Create(new ProtoBufMediaTypeFormatter(ProtoBufDefaults.TypeModel))
                 );
                 break;
             case BenchmarkDataType.MessagePack:
-                TestSubject = new TestFormatterSimpleModelClient(
+                TestSubject = new PersonModelListClient(
                     Client,
                     new OptionsWrapper<ApiClientSettings>(
                         new ApiClientSettings
@@ -56,12 +55,12 @@ public class FormattersBenchmark : MvcTestFixture
                             ConnectionString = Client.BaseAddress!.AbsoluteUri,
                         }
                     ),
-                    new TestFormatterProvider(new MessagePackMediaTypeFormatter(MessagePackDefaults.SerializerOptions))
+                    Options.Create(new MessagePackMediaTypeFormatter(MessagePackDefaults.SerializerOptions))
                 );
                 break;
             case BenchmarkDataType.Json:
             default:
-                TestSubject = new TestFormatterSimpleModelClient(
+                TestSubject = new PersonModelListClient(
                     Client,
                     new OptionsWrapper<ApiClientSettings>(
                         new ApiClientSettings
@@ -126,12 +125,12 @@ public class FormattersBenchmark : MvcTestFixture
     public BenchmarkDataType DataType = BenchmarkDataType.Json;
     
     [Benchmark]
-    public async Task<List<SimpleModel>> ListStressTest()
+    public async Task<List<PersonModel>> ListStressTest()
     {
         // Arrange
         var id = Interlocked.Increment(ref _idProvider);
         var cancel = CancellationToken.None;
-        var input = SimpleModel.Create();
+        var input = new PersonModel();
         var length = 10_000;
         var stopwatch = new Stopwatch();
 
@@ -139,19 +138,24 @@ public class FormattersBenchmark : MvcTestFixture
         await TestSubject.AddListAsync(id, cancel);
         stopwatch.Start();
         for (var i = 0; i < length; i++)
-            await TestSubject.PostModelToListAsync(id, input, cancel);
+        {
+            input.Id = (ulong?)i;
+            await TestSubject.AddPersonAsync(id, input, cancel);
+        }
+
         stopwatch.Stop();
 
         stopwatch.Reset();
         stopwatch.Start();
-        var response = await TestSubject.GetAllFromListModelAsync(id, cancel);
+        var response = await TestSubject.GetPersonListAsync(id, cancel);
         stopwatch.Stop();
 
         stopwatch.Reset();
         stopwatch.Start();
         for (var i = 0; i < length; i++)
         {
-            await TestSubject.DeleteFromListAsync(id, cancel);
+            var personId = new PersonId(id, (ulong)i);
+            await TestSubject.DeletePersonAsync(personId, cancel);
         }
         stopwatch.Stop();
         await TestSubject.DeleteListAsync(id, cancel);

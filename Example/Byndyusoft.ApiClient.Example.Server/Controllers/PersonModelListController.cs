@@ -15,7 +15,7 @@ public class PersonModelListController : ControllerBase
     [FormatFilter]
     public IActionResult AddList(int id)
     {
-        PersonModelList.Data.Add(id, new Dictionary<ulong, PersonModel>());
+        PersonModelList.Data.TryAdd(id, new Dictionary<ulong, PersonModel>());
         return Ok();
     }
 
@@ -26,7 +26,7 @@ public class PersonModelListController : ControllerBase
     {
         if (!PersonModelList.Data.ContainsKey(id))
             return NotFound();
-        PersonModelList.Data.Remove(id);
+        PersonModelList.Data.Remove(id, out _);
         return Ok();
     }
 

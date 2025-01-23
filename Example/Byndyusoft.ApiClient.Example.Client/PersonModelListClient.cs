@@ -15,7 +15,7 @@ public class PersonModelListClient : BaseClient, IPersonModelListClient
     public PersonModelListClient(
             HttpClient client,
             IOptions<ApiClientSettings> apiSettings,
-            IOptions<MediaTypeFormatter> formatter = null
+            IOptions<MediaTypeFormatter>? formatter = null
         )
         : base(client, apiSettings, formatter) { }
 

@@ -37,9 +37,7 @@ namespace Byndyusoft.ApiClient.Example.Server.Swagger
                         Title = Assembly.GetExecutingAssembly().GetName().Name
                     }
                 );
-
             var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
-
             foreach (var xmlFile in xmlFiles)
                 options.IncludeXmlComments(xmlFile);
         }

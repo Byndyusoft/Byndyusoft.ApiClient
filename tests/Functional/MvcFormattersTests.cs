@@ -170,7 +170,8 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
 
         //Assert
         await Assert.ThrowsAsync<HttpRequestException>(
-            async () => await TestSubject.UpdatePersonAsync(listId, newPerson, cancel));
+            async () => await TestSubject.UpdatePersonAsync(listId, newPerson, cancel)
+        );
         await TestSubject.DeleteListAsync(listId, cancel);
     }
 }

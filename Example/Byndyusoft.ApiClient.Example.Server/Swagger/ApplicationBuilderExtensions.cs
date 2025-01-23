@@ -27,7 +27,6 @@ namespace Byndyusoft.ApiClient.Example.Server.Swagger
                                 $"/swagger/{apiVersionDescription.GroupName}/swagger.json",
                                 apiVersionDescription.GroupName.ToUpperInvariant()
                             );
-
                         options.DisplayRequestDuration();
                         options.DefaultModelRendering(ModelRendering.Model);
                         options.DefaultModelExpandDepth(3);

@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Contracts
+﻿namespace Byndyusoft.ApiClient.Example.Contracts
 {
     public class PersonModelListRoutes
     {

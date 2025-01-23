@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Swagger
+namespace Byndyusoft.ApiClient.Example.Server.Swagger
 {
     using System;
     using System.IO;
@@ -28,14 +28,15 @@ namespace Byndyusoft.ApiClient.Swagger
         public void Configure(SwaggerGenOptions options)
         {
             foreach (var apiVersionDescription in _apiVersionDescriptionProvider.ApiVersionDescriptions)
-                options.SwaggerDoc(apiVersionDescription.GroupName,
+                options.SwaggerDoc(
+                    apiVersionDescription.GroupName,
                     new OpenApiInfo
                     {
                         Version = apiVersionDescription.ApiVersion.ToString(),
                         Description = apiVersionDescription.IsDeprecated ? "DEPRECATED" : "",
                         Title = Assembly.GetExecutingAssembly().GetName().Name
-                    });
-
+                    }
+                );
 
             var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml");
 

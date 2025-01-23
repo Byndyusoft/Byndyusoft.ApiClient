@@ -2,10 +2,9 @@ namespace Byndyusoft.ApiClient.Functional;
 
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Net.Http.Json.Formatting;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Client;
+using Example.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit.Abstractions;

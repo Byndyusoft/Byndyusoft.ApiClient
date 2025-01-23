@@ -7,9 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Byndyusoft.ApiClient", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Tests", "tests\Byndyusoft.ApiClient.Tests.csproj", "{A4D9844E-C2DA-45EB-8AA8-1378B5072137}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example", "example\Byndyusoft.ApiClient.Example.csproj", "{D3BAEB82-7CEE-41C6-9368-94410FB532D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Server", "Example\Byndyusoft.ApiClient.Example.Server\Byndyusoft.ApiClient.Example.Server.csproj", "{D3BAEB82-7CEE-41C6-9368-94410FB532D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Benchmark", "Byndyusoft.ApiClient.Benchmark\Byndyusoft.ApiClient.Benchmark.csproj", "{75652FC0-4496-4EC4-BA8E-617AE05CFC30}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{8C97A966-5D6A-4D7F-9AC8-2D582883152A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Contracts", "Example\Byndyusoft.ApiClient.Example.Contracts\Byndyusoft.ApiClient.Example.Contracts.csproj", "{74DB2F65-EF05-444C-BA5A-38355B109393}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Models", "Example\Byndyusoft.ApiClient.Example.Models\Byndyusoft.ApiClient.Example.Models.csproj", "{5E8DB677-D0A1-43FA-89A9-8CE7B1D08B1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Client", "Example\Byndyusoft.ApiClient.Example.Client\Byndyusoft.ApiClient.Example.Client.csproj", "{CF40D501-21D9-4216-9129-E0A06A9D41B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,11 +41,29 @@ Global
 		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75652FC0-4496-4EC4-BA8E-617AE05CFC30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74DB2F65-EF05-444C-BA5A-38355B109393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74DB2F65-EF05-444C-BA5A-38355B109393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74DB2F65-EF05-444C-BA5A-38355B109393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74DB2F65-EF05-444C-BA5A-38355B109393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E8DB677-D0A1-43FA-89A9-8CE7B1D08B1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E8DB677-D0A1-43FA-89A9-8CE7B1D08B1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E8DB677-D0A1-43FA-89A9-8CE7B1D08B1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E8DB677-D0A1-43FA-89A9-8CE7B1D08B1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF40D501-21D9-4216-9129-E0A06A9D41B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF40D501-21D9-4216-9129-E0A06A9D41B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF40D501-21D9-4216-9129-E0A06A9D41B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF40D501-21D9-4216-9129-E0A06A9D41B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {18A76057-62EA-4F02-B8EC-C3805F5D6FEC}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{74DB2F65-EF05-444C-BA5A-38355B109393} = {8C97A966-5D6A-4D7F-9AC8-2D582883152A}
+		{5E8DB677-D0A1-43FA-89A9-8CE7B1D08B1A} = {8C97A966-5D6A-4D7F-9AC8-2D582883152A}
+		{CF40D501-21D9-4216-9129-E0A06A9D41B5} = {8C97A966-5D6A-4D7F-9AC8-2D582883152A}
+		{D3BAEB82-7CEE-41C6-9368-94410FB532D8} = {8C97A966-5D6A-4D7F-9AC8-2D582883152A}
 	EndGlobalSection
 EndGlobal

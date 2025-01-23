@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Swagger
+﻿namespace Byndyusoft.ApiClient.Example.Server.Swagger
 {
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;
@@ -12,11 +12,9 @@
         /// <summary>
         ///     AddSwagger
         /// </summary>
-        public static IServiceCollection AddSwagger(this IServiceCollection services)
-        {
-            return
-                services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>()
-                        .AddSwaggerGen();
-        }
+        public static IServiceCollection AddSwagger(this IServiceCollection services) =>
+                services
+                    .AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>()
+                    .AddSwaggerGen();
     }
 }

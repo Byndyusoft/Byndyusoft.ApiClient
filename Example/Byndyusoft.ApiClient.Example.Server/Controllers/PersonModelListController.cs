@@ -1,10 +1,10 @@
-﻿namespace Byndyusoft.ApiClient.Controllers;
+﻿namespace Byndyusoft.ApiClient.Example.Server.Controllers;
 
 using System.Collections.Generic;
 using System.Linq;
 using Contracts;
-using Models;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 [ApiController]
 [Route("[controller]")]
@@ -37,9 +37,7 @@ public class PersonModelListController : ControllerBase
     {
         if(!PersonModelList.Data.ContainsKey(id))
             return NotFound();
-        if (!model.Id.HasValue)
-            return BadRequest();
-        if (!PersonModelList.Data[id].TryAdd(model.Id.Value, model))
+        if (!PersonModelList.Data[id].TryAdd(model.Id, model))
             return new ConflictResult();
         return Ok(model);
     }
@@ -51,11 +49,7 @@ public class PersonModelListController : ControllerBase
     {
         if (!PersonModelList.Data.ContainsKey(id))
             return NotFound($"No data found by id: {id}");
-        if (!model.Id.HasValue)
-            return BadRequest();
-        var personId = model.Id.Value;
-        if (!PersonModelList.Data[id].ContainsKey(personId))
-            return NotFound($"No person found by id: {personId}");
+        var personId = model.Id;
         PersonModelList.Data[id][personId] = model;
         return Ok(model);
     }
@@ -68,9 +62,7 @@ public class PersonModelListController : ControllerBase
         if (!PersonModelList.Data.ContainsKey(id) || !PersonModelList.Data[id].Any())
             return NotFound($"No data found by id: {id}");
         var personList = PersonModelList.Data[id];
-        if (!model.Id.HasValue)
-            return BadRequest();
-        var personId = model.Id.Value;
+        var personId = model.Id;
         if (!personList.TryGetValue(personId, out var person))
             return NotFound($"No person found by id: {personId}");
         if (!string.IsNullOrEmpty(model.FirstName))

@@ -3,7 +3,7 @@ namespace Byndyusoft.ApiClient.Functional;
 using System.Net.Http;
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
-using Client;
+using Example.Client;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

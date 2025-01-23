@@ -14,12 +14,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using Client;
-using Models;
 using Functional;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Net.Http.ProtoBuf.Formatting;
+using Example.Client;
+using Example.Models;
 
 [SimpleJob(RunStrategy.Throughput)]
 [AllStatisticsColumn]
@@ -139,7 +139,7 @@ public class FormattersBenchmark : MvcTestFixture
         stopwatch.Start();
         for (var i = 0; i < length; i++)
         {
-            input.Id = (ulong?)i;
+            input.Id = (ulong)i;
             await TestSubject.AddPersonAsync(id, input, cancel);
         }
 

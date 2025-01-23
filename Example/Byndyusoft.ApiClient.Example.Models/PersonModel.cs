@@ -1,7 +1,6 @@
-namespace Byndyusoft.ApiClient.Models;
+namespace Byndyusoft.ApiClient.Example.Models;
 
 using System;
-using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using ProtoBuf;
@@ -11,7 +10,7 @@ public class PersonModel
 {
     [ProtoMember(1)][JsonInclude] public string? FirstName { get; set; }
 
-    [ProtoMember(2)][JsonInclude] public string? LastName = null;
+    [ProtoMember(2)][JsonPropertyName(nameof(LastName))][JsonInclude] public string? LastName = String.Empty;
 
     [ProtoMember(3)] public DateTime? DateOfBirth { get; set; }
 
@@ -19,7 +18,7 @@ public class PersonModel
 
     [ProtoMember(5)] public FavoriteDessertEnum? FavoriteDessert { get; set; }
 
-    [ProtoMember(6)] public ulong? Id { get; set; }
+    [ProtoMember(6)] public ulong Id { get; set; }
 
     [ProtoMember(7)] public ulong? DriverLicenseId { get; set; }
 
@@ -32,7 +31,7 @@ public class PersonModel
         string[]? childrenNames = null,
         bool? isMarried = null,
         FavoriteDessertEnum? favoriteDessert = null,
-        ulong? id = null,
+        ulong id = 0,
         ulong? driverLicenseId = null)
     {
         FirstName = firstName;
@@ -52,13 +51,13 @@ public class PersonModel
         DateOfBirth = null;
         IsMarried = null;
         FavoriteDessert = null;
-        Id = null;
+        Id = 0;
         DriverLicenseId = null;
         ChildrenNames = null;
     }
 
     public static PersonModel Create() => new(
-        "Jhon",
+        "John",
         "Doe",
         DateTime.UnixEpoch,
         ["Jane"],
@@ -70,7 +69,7 @@ public class PersonModel
     public override int GetHashCode() =>
         HashCode.Combine(FirstName, LastName, DateOfBirth, IsMarried, FavoriteDessert, Id, DriverLicenseId, ChildrenNames);
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (ReferenceEquals(this, obj)) return true;
         if (obj == null) return false;
@@ -80,14 +79,15 @@ public class PersonModel
 
     private bool Equals(PersonModel other)
     {
+        var childrenEqual = ChildrenNames?.SequenceEqual(other.ChildrenNames) ?? other.ChildrenNames == null;
         return
-            FirstName == other.FirstName &&
-            LastName == other.LastName &&
-            DateOfBirth == other.DateOfBirth &&
-            IsMarried == other.IsMarried &&
-            FavoriteDessert == other.FavoriteDessert &&
+            String.Equals(FirstName, other.FirstName, StringComparison.InvariantCulture) &&
+            String.Equals(LastName, other.LastName, StringComparison.InvariantCulture) &&
+            Nullable.Equals(DateOfBirth, other.DateOfBirth) &&
+            Nullable.Equals(IsMarried, other.IsMarried) &&
+            Nullable.Equals(FavoriteDessert, other.FavoriteDessert) &&
             Id == other.Id &&
             Nullable.Equals(DriverLicenseId, other.DriverLicenseId) &&
-            ChildrenNames.SequenceEqual(other.ChildrenNames);
+            childrenEqual;
     }
 }

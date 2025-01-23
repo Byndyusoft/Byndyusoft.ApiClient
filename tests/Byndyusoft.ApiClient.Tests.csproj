@@ -27,7 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\example\Byndyusoft.ApiClient.Example.csproj" />
+    <ProjectReference Include="..\Example\Byndyusoft.ApiClient.Example.Client\Byndyusoft.ApiClient.Example.Client.csproj" />
+    <ProjectReference Include="..\Example\Byndyusoft.ApiClient.Example.Models\Byndyusoft.ApiClient.Example.Models.csproj" />
+    <ProjectReference Include="..\Example\Byndyusoft.ApiClient.Example.Server\Byndyusoft.ApiClient.Example.Server.csproj" />
   </ItemGroup>
 
 </Project>

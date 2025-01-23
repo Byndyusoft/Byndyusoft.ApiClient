@@ -1,10 +1,7 @@
-﻿using Byndyusoft.ApiClient.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Threading;
-
-namespace Byndyusoft.ApiClient.Contracts
+﻿namespace Byndyusoft.ApiClient.Example.Contracts
 {
+    using Models;
+
     public interface IPersonModelListClient
     {
         public Task AddListAsync(int id, CancellationToken cancellationToken);

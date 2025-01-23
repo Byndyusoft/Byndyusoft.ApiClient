@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Byndyusoft.ApiClient.Example.Client</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Byndyusoft.ApiClient\Byndyusoft.ApiClient.csproj" />
+      <ProjectReference Include="..\Byndyusoft.ApiClient.Example.Contracts\Byndyusoft.ApiClient.Example.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>

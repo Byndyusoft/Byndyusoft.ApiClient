@@ -1,8 +1,11 @@
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Asp.Versioning;
 using Byndyusoft.ApiClient;
-using Byndyusoft.ApiClient.Client;
-using Byndyusoft.ApiClient.Contracts;
-using Byndyusoft.ApiClient.Swagger;
+using Byndyusoft.ApiClient.Example.Client;
+using Byndyusoft.ApiClient.Example.Contracts;
+using Byndyusoft.ApiClient.Example.Server.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

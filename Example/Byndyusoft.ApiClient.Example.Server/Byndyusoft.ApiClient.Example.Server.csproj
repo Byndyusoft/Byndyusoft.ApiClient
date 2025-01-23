@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
-		<RootNamespace>Byndyusoft.ApiClient</RootNamespace>
+		<RootNamespace>Byndyusoft.ApiClient.Example.Server</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -18,8 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\Byndyusoft.ApiClient\Byndyusoft.ApiClient.csproj" />
+	  <ProjectReference Include="..\Byndyusoft.ApiClient.Example.Client\Byndyusoft.ApiClient.Example.Client.csproj" />
 	</ItemGroup>
-
 
 </Project>

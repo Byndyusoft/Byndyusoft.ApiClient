@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient
+namespace Byndyusoft.ApiClient.Example.Benchmark
 {
     using BenchmarkDotNet.Configs;
     using BenchmarkDotNet.Running;

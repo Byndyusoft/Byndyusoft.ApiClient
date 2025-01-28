@@ -1,14 +1,14 @@
-namespace Byndyusoft.ApiClient.Functional;
+namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Example.Client;
-using Example.Models;
+using Client;
+using Models;
 using Xunit;
 using Xunit.Abstractions;
 
-public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : MvcTestFixture
+public abstract class FormattersTests(ITestOutputHelper testOutputHelper) : MvcTestFixture
 {
     protected PersonModelListClient TestSubject;
     private static int _idProvider = 0;
@@ -132,8 +132,8 @@ public abstract class MvcFormattersTests(ITestOutputHelper testOutputHelper) : M
         testOutputHelper.WriteLine($"id: {listId}");
         var oldPerson = PersonModel.Create();
         var newPerson = new PersonModel(
-            id:oldPerson.Id,
-            firstName:"Jane",
+            id: oldPerson.Id,
+            firstName: "Jane",
             childrenNames: ["John", "James", "Jennifer"]
         );
         var expectedPerson = PersonModel.Create();

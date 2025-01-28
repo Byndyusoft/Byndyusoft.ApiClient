@@ -1,56 +1,32 @@
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
-using Asp.Versioning;
-using Byndyusoft.ApiClient;
-using Byndyusoft.ApiClient.Example.Client;
-using Byndyusoft.ApiClient.Example.Contracts;
-using Byndyusoft.ApiClient.Example.Server.Swagger;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+namespace Byndyusoft.ApiClient.Example.Server;
+
+using Infrastructure.OpenTelemetryExtensions;
+using Logging.Builders;
+using Logging.Configuration;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args)
+            .Build()
+            .Run();
+    }
 
-services
-    .AddApiVersioning(
-        options =>
-        {
-            options.DefaultApiVersion = ApiVersion.Default;
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.ReportApiVersions = true;
-        }
-    )
-    .AddApiExplorer(
-        options =>
-        {
-            options.GroupNameFormat = "'v'VVV";
-            options.SubstituteApiVersionInUrl = true;
-        }
-    );
-
-services.AddSwagger();
-
-services
-    .AddMvcCore()
-    .AddProtoBufFormatters()
-    .AddMessagePackFormatters()
-    .AddFormatterMappings();
-services.AddControllers();
-
-services
-    .AddOptions()
-    .Configure<ApiClientSettings>(builder.Configuration.GetSection(nameof(ApiClientSettings)));
-
-services.AddHttpClient<IPersonModelListClient, PersonModelListClient>();
-
-var app = builder.Build();
-
-if (builder.Environment.IsProduction() == false)
-    app.UseSwaggerWithApiVersionDescriptionProvider();
-
-app.UseRouting();
-app.MapControllers();
-
-app.Run();
+    private static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        var serviceName = typeof(Program).Assembly.GetName().Name!;
+        return Host.CreateDefaultBuilder(args)
+            .UseSerilog(
+                (context, configuration) => configuration
+                    .UseDefaultSettings(context.Configuration)
+                    .UseOpenTelemetryTraces()
+                    .WriteToOpenTelemetry(activityEventBuilder: StructuredActivityEventBuilder.Instance)
+            )
+            .ConfigureServices((context, services) => services.AddOpenTelemetry(serviceName, context.Configuration))
+            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
+    }
+}

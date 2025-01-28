@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
+      <RootNamespace>Byndyusoft.ApiClient.Example.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Byndyusoft.ApiClient\Byndyusoft.ApiClient.csproj" />
+    <ProjectReference Include="..\Byndyusoft.ApiClient.Example.Server\Byndyusoft.ApiClient.Example.Server.csproj" />
   </ItemGroup>
 
 </Project>

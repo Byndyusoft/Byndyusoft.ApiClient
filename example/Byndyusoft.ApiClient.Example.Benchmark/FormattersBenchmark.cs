@@ -1,6 +1,5 @@
-namespace Byndyusoft.ApiClient;
+namespace Byndyusoft.ApiClient.Example.Benchmark;
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
@@ -8,18 +7,17 @@ using System.Net.Http.Json;
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
 using System.Net.Http.ProtoBuf;
+using System.Net.Http.ProtoBuf.Formatting;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using Functional;
+using Client;
+using Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Net.Http.ProtoBuf.Formatting;
-using Example.Client;
-using Example.Models;
 
 [SimpleJob(RunStrategy.Throughput)]
 [AllStatisticsColumn]

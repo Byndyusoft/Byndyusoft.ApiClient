@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <OutputType>Exe</OutputType>
+        <RootNamespace>Byndyusoft.ApiClient.Example.Benchmark</RootNamespace>
     </PropertyGroup>
     <PropertyGroup>
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -13,10 +14,10 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet" Version="0.14.0"/>
+        <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
         <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.11" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Example\Byndyusoft.ApiClient.Example.Server\Byndyusoft.ApiClient.Example.Server.csproj" />
+      <ProjectReference Include="..\Byndyusoft.ApiClient.Example.Server\Byndyusoft.ApiClient.Example.Server.csproj" />
     </ItemGroup>
 </Project>

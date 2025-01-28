@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
-using Byndyusoft.ApiClient;
+using ApiClient;
 using Contracts;
 using Microsoft.Extensions.Options;
 using Models;

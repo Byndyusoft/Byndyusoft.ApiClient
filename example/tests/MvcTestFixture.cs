@@ -1,13 +1,13 @@
 #nullable enable
-namespace Byndyusoft.ApiClient.Functional;
+namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
-using Example.Server.Controllers;
-using Microsoft.AspNetCore.Builder;
+using Server;
+using Server.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,10 +27,14 @@ public abstract class MvcTestFixture : IDisposable
                 .ConfigureWebHostDefaults(
                     webBuilder =>
                     {
-                        webBuilder.UseUrls(URL);
-                        webBuilder.UseTestServer();
+                        webBuilder.UseTestServer(
+                            options =>
+                            {
+                                options.AllowSynchronousIO = true;
+                            }
+                        );
+                        webBuilder.UseStartup<Startup>();
                         webBuilder.ConfigureServices(ConfigureServices);
-                        webBuilder.Configure(Configure);
                     }
                 )
                 .Build();
@@ -43,7 +47,7 @@ public abstract class MvcTestFixture : IDisposable
         {
             if (_client == null)
             {
-                _client = _host.GetTestClient();
+                _client = _host!.GetTestClient();
                 _client.BaseAddress = new Uri(URL);
                 ConfigureHttpClient(_client);
             }
@@ -61,12 +65,6 @@ public abstract class MvcTestFixture : IDisposable
         _client = null;
 
         GC.SuppressFinalize(this);
-    }
-
-    public virtual void Configure(IApplicationBuilder app)
-    {
-        app.UseRouting();
-        app.UseEndpoints(endpoints => endpoints.MapControllers());
     }
 
     public virtual void ConfigureServices(IServiceCollection services)
@@ -92,7 +90,7 @@ public abstract class MvcTestFixture : IDisposable
     {
         var listener = new TcpListener(IPAddress.Loopback, 0);
         listener.Start();
-        var port = ((IPEndPoint) listener.LocalEndpoint).Port;
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         return port;
     }

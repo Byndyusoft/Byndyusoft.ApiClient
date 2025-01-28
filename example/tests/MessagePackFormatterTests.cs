@@ -1,19 +1,19 @@
-namespace Byndyusoft.ApiClient.Functional;
+namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System.Net.Http;
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
-using Example.Client;
+using Client;
 using MessagePack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Xunit.Abstractions;
 
-public class MvcMessagePackTests : MvcFormattersTests
+public class MessagePackFormatterTests : FormattersTests
 {
     private readonly MessagePackSerializerOptions _serializerOptions;
 
-    public MvcMessagePackTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
+    public MessagePackFormatterTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
         _serializerOptions = MessagePackDefaults.SerializerOptions;
         TestSubject = new PersonModelListClient(

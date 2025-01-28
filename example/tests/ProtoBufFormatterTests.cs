@@ -1,21 +1,21 @@
-namespace Byndyusoft.ApiClient.Functional;
+namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System.Net.Http;
 using System.Net.Http.ProtoBuf;
 using System.Net.Http.ProtoBuf.Formatting;
-using Example.Client;
-using Example.Models;
+using Client;
+using Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using ProtoBuf.Meta;
 using Xunit;
 using Xunit.Abstractions;
 
-public class MvcProtobufTests : MvcFormattersTests
+public class ProtoBufFormatterTests : FormattersTests
 {
-    private readonly TypeModel _typeModel= ProtoBufDefaults.TypeModel;
+    private readonly TypeModel _typeModel = ProtoBufDefaults.TypeModel;
 
-    public MvcProtobufTests(ITestOutputHelper testOutputHelper):base(testOutputHelper)
+    public ProtoBufFormatterTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
         TestSubject = new PersonModelListClient(
             Client,

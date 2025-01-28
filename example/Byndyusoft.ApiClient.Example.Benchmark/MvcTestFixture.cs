@@ -1,12 +1,13 @@
 #nullable enable
-namespace Byndyusoft.ApiClient.Functional;
+namespace Byndyusoft.ApiClient.Example.Benchmark;
 
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
-using Example.Server.Controllers;
+using Server;
+using Server.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -27,10 +28,8 @@ public abstract class MvcTestFixture : IDisposable
                 .ConfigureWebHostDefaults(
                     webBuilder =>
                     {
-                        webBuilder.UseUrls(URL);
                         webBuilder.UseTestServer();
-                        webBuilder.ConfigureServices(ConfigureServices);
-                        webBuilder.Configure(Configure);
+                        webBuilder.UseStartup<Startup>();
                     }
                 )
                 .Build();

@@ -28,8 +28,8 @@ public class PersonModelListClient : BaseClient, IPersonModelListClient
     public Task<PersonModel> GetPersonAsync(PersonId id, CancellationToken cancellationToken)
         => GetAsync<PersonId, PersonModel>($"/{PersonModelListRoutes.PersonModelListPrefix}/{PersonModelListRoutes.GetPersonCmd}", id, cancellationToken);
 
-    public Task<List<PersonModel>> GetPersonListAsync(int id, CancellationToken cancellationToken)
-        => GetAsync<List<PersonModel>>($"/{PersonModelListRoutes.PersonModelListPrefix}/{PersonModelListRoutes.GetPersonListCmd}/{id}", cancellationToken);
+    public Task<Dictionary<ulong, PersonModel>> GetEveryPersonAsync(int id, CancellationToken cancellationToken)
+        => GetAsync<Dictionary<ulong, PersonModel>>($"/{PersonModelListRoutes.PersonModelListPrefix}/{PersonModelListRoutes.GetEveryPersonCmd}/{id}", cancellationToken);
 
     public Task<PersonModel> AddPersonAsync(int id, PersonModel content, CancellationToken cancellationToken)
         => PostAsync<PersonModel>($"/{PersonModelListRoutes.PersonModelListPrefix}/{PersonModelListRoutes.AddPersonCmd}/{id}", content, cancellationToken);

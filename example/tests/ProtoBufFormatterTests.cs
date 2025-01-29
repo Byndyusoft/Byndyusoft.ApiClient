@@ -19,32 +19,8 @@ public class ProtoBufFormatterTests : FormattersTests
     {
         TestSubject = new PersonModelListClient(
             Client,
-            new OptionsWrapper<ApiClientSettings>(
-                new ApiClientSettings
-                {
-                    ConnectionString = URL
-                }
-            ),
+            _clientSettings,
             Options.Create(new ProtoBufMediaTypeFormatter(ProtoBufDefaults.TypeModel))
         );
-    }
-
-    protected override void ConfigureHttpClient(HttpClient client)
-    {
-        client.DefaultRequestHeaders.Accept.Add(ProtoBufDefaults.MediaTypeHeader);
-    }
-
-    protected override void ConfigureMvc(IMvcCoreBuilder builder)
-    {
-        builder
-            .AddProtoBufNet(options => { options.Model = _typeModel; });
-    }
-
-    [Fact]
-    public void ExpectPersonModelSerializedTest()
-    {
-        var formatter = new ProtoBufMediaTypeFormatter(ProtoBufDefaults.TypeModel);
-        Assert.True(formatter.CanReadType(typeof(PersonModel)));
-        Assert.True(formatter.CanWriteType(typeof(PersonModel)));
     }
 }

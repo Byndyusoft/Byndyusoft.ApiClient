@@ -1,6 +1,7 @@
 namespace Byndyusoft.ApiClient.Example.Server
 {
     using System;
+    using System.Net.Http.ProtoBuf;
     using Asp.Versioning;
     using ApiClient;
     using Client;
@@ -44,7 +45,7 @@ namespace Byndyusoft.ApiClient.Example.Server
 
             services
                 .AddMvcCore()
-                .AddProtoBufFormatters()
+                .AddProtoBufNet(options => { options.Model = ProtoBufDefaults.TypeModel; })
                 .AddMessagePackFormatters()
                 .AddFormatterMappings();
             services.AddControllers();

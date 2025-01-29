@@ -15,8 +15,18 @@ public class PersonModelListController : ControllerBase
     [FormatFilter]
     public IActionResult AddList(int id)
     {
-        PersonModelList.Data.TryAdd(id, new Dictionary<ulong, PersonModel>());
+        PersonModelDictionary.Data.TryAdd(id, new Dictionary<ulong, PersonModel>());
         return Ok();
+    }
+
+    [HttpGet]
+    [Route(PersonModelListRoutes.GetEveryPersonCmd + "/{id}")]
+    [FormatFilter]
+    public IActionResult GetEveryPerson(int id)
+    {
+        if (!PersonModelDictionary.Data.TryGetValue(id, out var value))
+            return NotFound();
+        return Ok(value);
     }
 
     [HttpDelete]
@@ -24,9 +34,9 @@ public class PersonModelListController : ControllerBase
     [FormatFilter]
     public IActionResult DeleteList(int id)
     {
-        if (!PersonModelList.Data.ContainsKey(id))
+        if (!PersonModelDictionary.Data.ContainsKey(id))
             return NotFound();
-        PersonModelList.Data.Remove(id, out _);
+        PersonModelDictionary.Data.Remove(id, out _);
         return Ok();
     }
 
@@ -35,9 +45,9 @@ public class PersonModelListController : ControllerBase
     [FormatFilter]
     public IActionResult AddPerson([FromBody] PersonModel model, int id)
     {
-        if(!PersonModelList.Data.ContainsKey(id))
+        if(!PersonModelDictionary.Data.ContainsKey(id))
             return NotFound();
-        if (!PersonModelList.Data[id].TryAdd(model.Id, model))
+        if (!PersonModelDictionary.Data[id].TryAdd(model.Id, model))
             return new ConflictResult();
         return Ok(model);
     }
@@ -47,10 +57,10 @@ public class PersonModelListController : ControllerBase
     [FormatFilter]
     public IActionResult ReplacePerson([FromBody] PersonModel model, int id)
     {
-        if (!PersonModelList.Data.ContainsKey(id))
+        if (!PersonModelDictionary.Data.ContainsKey(id))
             return NotFound($"No data found by id: {id}");
         var personId = model.Id;
-        PersonModelList.Data[id][personId] = model;
+        PersonModelDictionary.Data[id][personId] = model;
         return Ok(model);
     }
 
@@ -59,9 +69,9 @@ public class PersonModelListController : ControllerBase
     [FormatFilter]
     public IActionResult UpdatePerson([FromBody] PersonModel model, int id)
     {
-        if (!PersonModelList.Data.ContainsKey(id) || !PersonModelList.Data[id].Any())
+        if (!PersonModelDictionary.Data.ContainsKey(id) || !PersonModelDictionary.Data[id].Any())
             return NotFound($"No data found by id: {id}");
-        var personList = PersonModelList.Data[id];
+        var personList = PersonModelDictionary.Data[id];
         var personId = model.Id;
         if (!personList.TryGetValue(personId, out var person))
             return NotFound($"No person found by id: {personId}");
@@ -88,22 +98,12 @@ public class PersonModelListController : ControllerBase
         [FromQuery] ulong id
     )
     {
-        if (!PersonModelList.Data.ContainsKey(listId) || !PersonModelList.Data[listId].Any())
+        if (!PersonModelDictionary.Data.ContainsKey(listId) || !PersonModelDictionary.Data[listId].Any())
             return NotFound($"No data found by id: {id}");
-        var personList = PersonModelList.Data[listId];
+        var personList = PersonModelDictionary.Data[listId];
         if (!personList.TryGetValue(id, out var person))
             return NotFound($"No person found by id: {id}");
         return Ok(person);
-    }
-
-    [HttpGet]
-    [Route(PersonModelListRoutes.GetPersonListCmd + "/{id}")]
-    [FormatFilter]
-    public IActionResult GetEveryPerson(int id)
-    {
-        if (!PersonModelList.Data.TryGetValue(id, out var value))
-            return NotFound();
-        return Ok(value);
     }
 
     [HttpDelete]
@@ -114,9 +114,9 @@ public class PersonModelListController : ControllerBase
         [FromQuery] ulong id
     )
     {
-        if (!PersonModelList.Data.ContainsKey(listId) || !PersonModelList.Data[listId].Any())
+        if (!PersonModelDictionary.Data.ContainsKey(listId) || !PersonModelDictionary.Data[listId].Any())
             return NotFound($"No data found by id: {id}");
-        var personList = PersonModelList.Data[listId];
+        var personList = PersonModelDictionary.Data[listId];
         if (!personList.ContainsKey(id))
             return NotFound($"No person found by id: {id}");
         personList.Remove(id);

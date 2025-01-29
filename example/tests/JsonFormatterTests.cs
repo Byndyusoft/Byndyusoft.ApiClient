@@ -1,44 +1,15 @@
 namespace Byndyusoft.ApiClient.Example.Tests;
 
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using Client;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Xunit.Abstractions;
 
 public class JsonFormatterTests : FormattersTests
 {
-    private readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web)
-    {
-        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-    };
-
     public JsonFormatterTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
         TestSubject = new PersonModelListClient(
             Client,
-            new OptionsWrapper<ApiClientSettings>(
-                new ApiClientSettings
-                {
-                    ConnectionString = URL
-                }
-            )
-        );
-    }
-
-    protected override void ConfigureHttpClient(HttpClient client)
-    {
-        client.DefaultRequestHeaders.Accept.Add(JsonDefaults.MediaTypeHeader);
-    }
-
-    protected override void ConfigureMvc(IMvcCoreBuilder builder)
-    {
-        builder.AddJsonOptions
-        (
-            options => { options.JsonSerializerOptions.CopyFrom(_serializerOptions); }
+            _clientSettings
         );
     }
 }

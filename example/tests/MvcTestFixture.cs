@@ -2,42 +2,37 @@
 namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System;
-using System.Net;
 using System.Net.Http;
-using System.Net.Sockets;
-using System.Reflection;
 using Server;
-using Server.Controllers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public abstract class MvcTestFixture : IDisposable
 {
-    protected readonly string URL;
     private HttpClient? _client;
-    protected IHost? _host;
+    private IHost? _host;
+    protected IOptions<ApiClientSettings> _clientSettings = new OptionsWrapper<ApiClientSettings>(
+        new ApiClientSettings
+        {
+            ConnectionString = "http://localhost:5000"
+        }
+    );
 
     protected MvcTestFixture()
     {
-        URL = $"http://localhost:{FreeTcpPort()}";
-        _host = Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(
-                    webBuilder =>
-                    {
-                        webBuilder.UseTestServer(
-                            options =>
-                            {
-                                options.AllowSynchronousIO = true;
-                            }
-                        );
-                        webBuilder.UseStartup<Startup>();
-                        webBuilder.ConfigureServices(ConfigureServices);
-                    }
-                )
-                .Build();
+        _host = Host
+            .CreateDefaultBuilder()
+            .ConfigureWebHostDefaults(
+                webBuilder =>
+                {
+                    webBuilder.UseTestServer();
+                    webBuilder.UseStartup<Startup>();
+                }
+            )
+            .Build();
         _host.Start();
     }
 
@@ -48,8 +43,6 @@ public abstract class MvcTestFixture : IDisposable
             if (_client == null)
             {
                 _client = _host!.GetTestClient();
-                _client.BaseAddress = new Uri(URL);
-                ConfigureHttpClient(_client);
             }
 
             return _client;
@@ -65,33 +58,5 @@ public abstract class MvcTestFixture : IDisposable
         _client = null;
 
         GC.SuppressFinalize(this);
-    }
-
-    public virtual void ConfigureServices(IServiceCollection services)
-    {
-        services.AddLogging(c => c.ClearProviders());
-        services.AddControllers();
-        var assembly = Assembly.GetAssembly(typeof(PersonModelListController));
-        ConfigureMvc(
-            services
-                .AddMvcCore()
-                .AddApplicationPart(assembly!)
-                .AddControllersAsServices()
-            );
-    }
-
-    protected abstract void ConfigureMvc(IMvcCoreBuilder builder);
-
-    protected virtual void ConfigureHttpClient(HttpClient client)
-    {
-    }
-
-    private static int FreeTcpPort()
-    {
-        var listener = new TcpListener(IPAddress.Loopback, 0);
-        listener.Start();
-        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return port;
     }
 }

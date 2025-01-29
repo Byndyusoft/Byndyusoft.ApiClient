@@ -2,21 +2,16 @@ namespace Byndyusoft.ApiClient.Example.Benchmark;
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
 using System.Net.Http.ProtoBuf;
 using System.Net.Http.ProtoBuf.Formatting;
-using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
 using Client;
 using Models;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 [SimpleJob(RunStrategy.Throughput)]
@@ -29,30 +24,26 @@ public class FormattersBenchmark : MvcTestFixture
     [GlobalSetup]
     public void Setup()
     {
-        //TestSubject = _benchmarkData.TestSubject.Value;
+        var settings =
+            new OptionsWrapper<ApiClientSettings>(
+                new ApiClientSettings
+                {
+                    ConnectionString = "http://localhost:5000",
+                }
+            );
         switch (DataType)
         {
             case BenchmarkDataType.ProtoBuf:
                 TestSubject = new PersonModelListClient(
                     Client,
-                    new OptionsWrapper<ApiClientSettings>(
-                        new ApiClientSettings
-                        {
-                            ConnectionString = Client.BaseAddress!.AbsoluteUri,
-                        }
-                    ),
+                    settings,
                     Options.Create(new ProtoBufMediaTypeFormatter(ProtoBufDefaults.TypeModel))
                 );
                 break;
             case BenchmarkDataType.MessagePack:
                 TestSubject = new PersonModelListClient(
                     Client,
-                    new OptionsWrapper<ApiClientSettings>(
-                        new ApiClientSettings
-                        {
-                            ConnectionString = Client.BaseAddress!.AbsoluteUri,
-                        }
-                    ),
+                    settings,
                     Options.Create(new MessagePackMediaTypeFormatter(MessagePackDefaults.SerializerOptions))
                 );
                 break;
@@ -60,61 +51,8 @@ public class FormattersBenchmark : MvcTestFixture
             default:
                 TestSubject = new PersonModelListClient(
                     Client,
-                    new OptionsWrapper<ApiClientSettings>(
-                        new ApiClientSettings
-                        {
-                            ConnectionString = Client.BaseAddress!.AbsoluteUri,
-                        }
-                    )
+                    settings
                 );
-                break;
-        }
-    }
-
-    protected override void ConfigureMvc(IMvcCoreBuilder builder)
-    {
-        switch (DataType)
-        {
-            case BenchmarkDataType.ProtoBuf:
-                builder.AddProtoBufNet(options => { options.Model = ProtoBufDefaults.TypeModel; });
-                break;
-            case BenchmarkDataType.MessagePack:
-                builder.AddMessagePackFormatters(
-                    options =>
-                    {
-                        options.SerializerOptions = MessagePackDefaults.SerializerOptions;
-                    }
-                );
-                break;
-            case BenchmarkDataType.Json:
-            default:
-                builder.AddJsonOptions(
-                    options =>
-                    {
-                        options.JsonSerializerOptions.CopyFrom(
-                            new(JsonSerializerDefaults.Web)
-                            {
-                                TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-                            });
-                    }
-                );
-                break;
-        }
-    }
-
-    protected override void ConfigureHttpClient(HttpClient client)
-    {
-        switch (DataType)
-        {
-            case BenchmarkDataType.ProtoBuf:
-                client.DefaultRequestHeaders.Accept.Add(ProtoBufDefaults.MediaTypeHeader);
-                break;
-            case BenchmarkDataType.MessagePack:
-                client.DefaultRequestHeaders.Accept.Add(MessagePackDefaults.MediaTypeHeader);
-                break;
-            case BenchmarkDataType.Json:
-            default:
-                client.DefaultRequestHeaders.Accept.Add(JsonDefaults.MediaTypeHeader);
                 break;
         }
     }
@@ -123,7 +61,7 @@ public class FormattersBenchmark : MvcTestFixture
     public BenchmarkDataType DataType = BenchmarkDataType.Json;
     
     [Benchmark]
-    public async Task<List<PersonModel>> ListStressTest()
+    public async Task<Dictionary<ulong,PersonModel>> ListStressTest()
     {
         // Arrange
         var id = Interlocked.Increment(ref _idProvider);
@@ -145,7 +83,7 @@ public class FormattersBenchmark : MvcTestFixture
 
         stopwatch.Reset();
         stopwatch.Start();
-        var response = await TestSubject.GetPersonListAsync(id, cancel);
+        var response = await TestSubject.GetEveryPersonAsync(id, cancel);
         stopwatch.Stop();
 
         stopwatch.Reset();

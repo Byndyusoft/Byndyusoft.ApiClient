@@ -1,5 +1,6 @@
 namespace Byndyusoft.ApiClient.Example.Tests;
 
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -173,5 +174,30 @@ public abstract class FormattersTests(ITestOutputHelper testOutputHelper) : MvcT
             async () => await TestSubject.UpdatePersonAsync(listId, newPerson, cancel)
         );
         await TestSubject.DeleteListAsync(listId, cancel);
+    }
+
+
+    [Fact]
+    protected async Task TryAddingPerson_ExpectingGetListWithSamePerson_Test()
+    {
+        // Arrange
+        var listId = Interlocked.Increment(ref _idProvider);
+        var cancel = CancellationToken.None;
+        testOutputHelper.WriteLine($"id: {listId}");
+        var newPerson = PersonModel.Create();
+
+        // Act
+        await TestSubject.AddListAsync(listId, cancel);
+        var response = await TestSubject.AddPersonAsync(listId, newPerson, cancel);
+        var actualList = await TestSubject.GetEveryPersonAsync(listId, cancel);
+        var personId = new PersonId(listId, response.Id);
+        await TestSubject.DeletePersonAsync(personId, cancel);
+        await TestSubject.DeleteListAsync(listId, cancel);
+
+        // Assert
+        Assert.NotNull(actualList);
+        actualList = Assert.IsType<Dictionary<ulong, PersonModel>>(actualList);
+        var expectedList = new Dictionary<ulong, PersonModel> {[newPerson.Id] = newPerson};
+        Assert.Equal(expectedList, actualList);
     }
 }

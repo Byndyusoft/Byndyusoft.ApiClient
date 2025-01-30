@@ -13,8 +13,6 @@ using Xunit.Abstractions;
 
 public class ProtoBufFormatterTests : FormattersTests
 {
-    private readonly TypeModel _typeModel = ProtoBufDefaults.TypeModel;
-
     public ProtoBufFormatterTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
         TestSubject = new PersonModelListClient(

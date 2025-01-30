@@ -17,9 +17,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Exampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Client", "Example\Byndyusoft.ApiClient.Example.Client\Byndyusoft.ApiClient.Example.Client.csproj", "{CF40D501-21D9-4216-9129-E0A06A9D41B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Tests", "example\tests\Byndyusoft.ApiClient.Example.Tests.csproj", "{8321C290-1333-4FB1-BB85-C9958B1C98F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Tests", "Example\tests\Byndyusoft.ApiClient.Example.Tests.csproj", "{8321C290-1333-4FB1-BB85-C9958B1C98F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Benchmark", "example\Byndyusoft.ApiClient.Example.Benchmark\Byndyusoft.ApiClient.Example.Benchmark.csproj", "{DAA94A70-F5EE-4912-B04E-4FF9FF74CDCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Byndyusoft.ApiClient.Example.Benchmark", "Example\Byndyusoft.ApiClient.Example.Benchmark\Byndyusoft.ApiClient.Example.Benchmark.csproj", "{DAA94A70-F5EE-4912-B04E-4FF9FF74CDCE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -14,15 +14,18 @@
         /// </summary>
         public static void AddPersonClient(this IServiceCollection services, IConfiguration configuration)
         {
+            var settingsSection = configuration.GetSection(nameof(ApiClientSettings));
+            var settings = settingsSection.Get<ApiClientSettings>();
+            
             services
                 .AddOptions()
-                .Configure<ApiClientSettings>(configuration.GetSection(nameof(ApiClientSettings)));
+                .Configure<ApiClientSettings>(settingsSection);
 
             services.AddHttpClient<IPersonApi, PersonApi>(
                 client=>
                     new PersonApi(
                         client,
-                        configuration.Get<IOptions<ApiClientSettings>>()!,
+                        Options.Create<ApiClientSettings>(settings),
                         new JsonMediaTypeFormatter()
                     )
             );

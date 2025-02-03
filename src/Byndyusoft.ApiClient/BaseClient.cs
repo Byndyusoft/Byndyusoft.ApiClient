@@ -16,23 +16,19 @@ namespace Byndyusoft.ApiClient
         protected readonly HttpClient Client;
         protected readonly ApiClientSettings ApiSettings;
 
-        protected BaseClient
-        (
+        protected BaseClient(
             HttpClient client,
             IOptions<ApiClientSettings> apiSettings,
-            IOptions<MediaTypeFormatter>? formatter = null
+            MediaTypeFormatter? formatter = null
         )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
             ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
-            Formatter = formatter?.Value ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
+            Formatter = formatter ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
+            
             foreach (var mediaTypeHeaderValue in Formatter.SupportedMediaTypes)
-                Client.DefaultRequestHeaders.Accept.Add
-                (
-                    new MediaTypeWithQualityHeaderValue
-                    (
-                        mediaTypeHeaderValue.MediaType
-                    )
+                Client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue(mediaTypeHeaderValue.MediaType)
                 );
         }
         
@@ -87,12 +83,8 @@ namespace Byndyusoft.ApiClient
             
             var result = await response
                 .Content
-                .ReadAsAsync<TResult>
-                (
-                    new[]
-                    {
-                        Formatter
-                    },
+                .ReadAsAsync<TResult>(
+                    new[] { Formatter },
                     cancellationToken
                 )
                 .ConfigureAwait(false);

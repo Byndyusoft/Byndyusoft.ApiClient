@@ -25,13 +25,13 @@ public interface ISomethingGetter
 
 2. Create your API client class and derive it from BaseClient class, inmplement your contract, if you want some specific formatter, we recomend to add it here:
 ```csharp
-public class SomeApiClient : BaseClient, ISomethingGetter
+public class SomethingGetter : BaseClient, ISomethingGetter
 {
-	public SomeApiClient(HttpClient client, IOptions<ApiClientSettings> apiSettings) :
+	public SomethingGetter(HttpClient client, IOptions<ApiClientSettings> apiSettings) :
 		base(client, apiSettings, Options.Create(new SomeMediaTypeFormatter()))
 	{
 		public Task<Something> GetSomethingAsync(CancellationToken cancellationToken)
-			=> GetAsync<Something>("/yourURI", cancellationToken);
+			=> GetAsync<Something>("api/get", cancellationToken);
 	}
 }
 ```

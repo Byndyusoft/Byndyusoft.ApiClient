@@ -17,7 +17,7 @@ dotnet add package Byndyusoft.ApiClient
 To create an API client:
 1. Create your contract:
 ```csharp
-public interface ISomethingGetter
+public interface ISomeApi
 {
 	public Task<Something> GetSomethingAsync(CancellationToken cancellationToken);
 }
@@ -25,10 +25,10 @@ public interface ISomethingGetter
 
 2. Create your API client class and derive it from BaseClient class, inmplement your contract, if you want some specific formatter, we recomend to add it here:
 ```csharp
-public class SomethingGetter : BaseClient, ISomethingGetter
+public class SomeApiClient : BaseClient, ISomeApi
 {
-	public SomethingGetter(HttpClient client, IOptions<ApiClientSettings> apiSettings) :
-		base(client, apiSettings, Options.Create(new SomeMediaTypeFormatter()))
+	public SomeApiClient(HttpClient client, IOptions<ApiClientSettings> apiSettings) :
+		base(client, apiSettings, new SomeMediaTypeFormatter())
 	{
 		public Task<Something> GetSomethingAsync(CancellationToken cancellationToken)
 			=> GetAsync<Something>("api/get", cancellationToken);
@@ -56,7 +56,7 @@ public Task<Model> Get(GetModelRequest getModelRequest) =>
 
 4.  Make sure to register your client wherever you need it:
 ```csharp
-serviceCollection.AddHttpClient<ISomethingGetter, SomeApiClient>();
+serviceCollection.AddHttpClient<ISomeApi, SomeApiClient>();
 ```
 
 # Maintainers

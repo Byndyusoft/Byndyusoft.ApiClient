@@ -61,10 +61,13 @@ public abstract class FormattersTests(
 
         // Act
         await TestSubject.AddListAsync(listId, cancel);
+        
         var actualPerson = await TestSubject.AddPersonAsync(listId, newPerson, cancel);
         var personId = new PersonId(listId, actualPerson.Id);
+        
         actualPerson = await TestSubject.GetPersonAsync(personId, cancel);
         personId = new PersonId(listId, actualPerson.Id);
+        
         await TestSubject.DeletePersonAsync(personId, cancel);
         await TestSubject.DeleteListAsync(listId, cancel);
 
@@ -84,10 +87,13 @@ public abstract class FormattersTests(
 
         // Act
         await TestSubject.AddListAsync(listId, cancel);
+        
         var actualPerson = await TestSubject.ReplacePersonAsync(listId, newPerson, cancel);
         var personId = new PersonId(listId, actualPerson.Id);
+        
         actualPerson = await TestSubject.GetPersonAsync(personId, cancel);
         personId = new PersonId(listId, actualPerson.Id);
+        
         await TestSubject.DeletePersonAsync(personId, cancel);
         await TestSubject.DeleteListAsync(listId, cancel);
 
@@ -112,11 +118,15 @@ public abstract class FormattersTests(
 
         // Act
         await TestSubject.AddListAsync(listId, cancel);
+        
         await TestSubject.AddPersonAsync(listId, oldPerson, cancel);
+        
         var actualPerson = await TestSubject.ReplacePersonAsync(listId, newPerson, cancel);
         var personId = new PersonId(listId, actualPerson.Id);
+        
         actualPerson = await TestSubject.GetPersonAsync(personId, cancel);
         personId = new PersonId(listId, actualPerson.Id);
+        
         await TestSubject.DeletePersonAsync(personId, cancel);
         await TestSubject.DeleteListAsync(listId, cancel);
 
@@ -144,11 +154,15 @@ public abstract class FormattersTests(
 
         // Act
         await TestSubject.AddListAsync(listId, cancel);
+        
         await TestSubject.AddPersonAsync(listId, oldPerson, cancel);
+        
         var actualPerson = await TestSubject.UpdatePersonAsync(listId, newPerson, cancel);
         var personId = new PersonId(listId, actualPerson.Id);
+        
         actualPerson = await TestSubject.GetPersonAsync(personId, cancel);
         personId = new PersonId(listId, actualPerson.Id);
+        
         await TestSubject.DeletePersonAsync(personId, cancel);
         await TestSubject.DeleteListAsync(listId, cancel);
 
@@ -188,9 +202,12 @@ public abstract class FormattersTests(
 
         // Act
         await TestSubject.AddListAsync(listId, cancel);
+        
         var actualPerson = await TestSubject.AddPersonAsync(listId, newPerson, cancel);
+        
         var actualList = await TestSubject.GetEveryPersonAsync(listId, cancel);
         var personId = new PersonId(listId, actualPerson.Id);
+        
         await TestSubject.DeletePersonAsync(personId, cancel);
         await TestSubject.DeleteListAsync(listId, cancel);
 

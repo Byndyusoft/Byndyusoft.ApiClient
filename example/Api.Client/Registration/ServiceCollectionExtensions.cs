@@ -1,7 +1,7 @@
-﻿namespace Byndyusoft.ApiClient.Example.Client.Registration
+﻿namespace Api.Client.Registration
 {
-    using System.Net.Http.Formatting;
     using System.Net.Http.Json.Formatting;
+    using Byndyusoft.ApiClient;
     using Contracts;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;

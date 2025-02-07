@@ -2,7 +2,7 @@ namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System.Net.Http.ProtoBuf;
 using System.Net.Http.ProtoBuf.Formatting;
-using Client;
+using Api.Client;
 using Xunit.Abstractions;
 
 public class ProtoBufFormatterTests : FormattersTests

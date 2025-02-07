@@ -1,6 +1,6 @@
 namespace Byndyusoft.ApiClient.Example.Tests;
 
-using Client;
+using Api.Client;
 using Xunit.Abstractions;
 
 public class JsonFormatterTests : FormattersTests

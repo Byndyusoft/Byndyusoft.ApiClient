@@ -3,7 +3,7 @@ namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System;
 using System.Net.Http;
-using Server;
+using Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
-      <RootNamespace>Byndyusoft.ApiClient.Example.Tests</RootNamespace>
+      <RootNamespace>Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Api\Byndyusoft.ApiClient.Example.Server.csproj" />
-    <ProjectReference Include="..\Api.Client\Byndyusoft.ApiClient.Example.Client.csproj" />
+    <ProjectReference Include="..\Api\Api.csproj" />
+    <ProjectReference Include="..\Api.Client\Api.Client.csproj" />
   </ItemGroup>
 
 </Project>

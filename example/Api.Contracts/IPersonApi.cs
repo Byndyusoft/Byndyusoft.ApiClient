@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Example.Contracts
+﻿namespace Api.Contracts
 {
     using System.Collections.Generic;
     using System.Threading;

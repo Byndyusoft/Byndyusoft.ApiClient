@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Example.Server.Infrastructure.OpenTelemetryExtensions;
+﻿namespace Api.Infrastructure.OpenTelemetryExtensions;
 
 using System.Linq;
 using OpenTelemetry.Instrumentation.AspNetCore;

@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Example.Server.Infrastructure.Versioning
+﻿namespace Api.Infrastructure.Versioning
 {
     using Asp.Versioning;
     using Microsoft.Extensions.DependencyInjection;

@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Example.Models
+﻿namespace Models
 {
     public enum FavoriteDessertEnum
     {

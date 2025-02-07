@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Example.Server
+namespace Api
 {
     using System;
     using System.Net.Http.ProtoBuf;

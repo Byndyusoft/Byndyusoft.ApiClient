@@ -1,8 +1,8 @@
-﻿namespace Byndyusoft.ApiClient.Example.Server.Controllers;
+﻿namespace Api.Controllers;
 
 using System.Collections.Generic;
 using System.Linq;
-using Contracts;
+using Api.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 

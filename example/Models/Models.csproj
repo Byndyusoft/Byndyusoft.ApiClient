@@ -4,11 +4,11 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Byndyusoft.ApiClient.Example.Contracts</RootNamespace>
+        <RootNamespace>Models</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Models\Byndyusoft.ApiClient.Example.Models.csproj" />
+      <PackageReference Include="protobuf-net.Core" Version="3.2.46" />
     </ItemGroup>
 
 </Project>

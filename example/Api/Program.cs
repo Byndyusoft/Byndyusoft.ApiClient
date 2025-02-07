@@ -1,8 +1,8 @@
-namespace Byndyusoft.ApiClient.Example.Server;
+namespace Api;
 
+using Byndyusoft.Logging.Builders;
+using Byndyusoft.Logging.Configuration;
 using Infrastructure.OpenTelemetryExtensions;
-using Logging.Builders;
-using Logging.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;

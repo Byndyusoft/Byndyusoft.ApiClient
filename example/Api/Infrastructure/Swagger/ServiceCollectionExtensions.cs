@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.ApiClient.Example.Server.Infrastructure.Swagger
+﻿namespace Api.Infrastructure.Swagger
 {
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Options;

@@ -1,14 +1,14 @@
-namespace Byndyusoft.ApiClient.Example.Client;
+namespace Api.Client;
 
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
-using ApiClient;
+using Byndyusoft.ApiClient;
 using Contracts;
-using Microsoft.Extensions.Options;
 using Models;
+using Microsoft.Extensions.Options;
 
 public class PersonApi : BaseClient, IPersonApi
 {

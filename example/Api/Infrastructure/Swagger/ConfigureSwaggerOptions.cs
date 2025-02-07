@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Example.Server.Infrastructure.Swagger
+namespace Api.Infrastructure.Swagger
 {
     using System;
     using System.IO;

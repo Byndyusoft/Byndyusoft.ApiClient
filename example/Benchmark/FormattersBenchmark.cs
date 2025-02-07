@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Example.Benchmark;
+namespace Benchmark;
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,9 +8,10 @@ using System.Net.Http.ProtoBuf;
 using System.Net.Http.ProtoBuf.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
+using Api.Client;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
-using Client;
+using Byndyusoft.ApiClient;
 using Models;
 using Microsoft.Extensions.Options;
 

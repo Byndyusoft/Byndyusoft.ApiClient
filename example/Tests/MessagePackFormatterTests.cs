@@ -2,7 +2,7 @@ namespace Byndyusoft.ApiClient.Example.Tests;
 
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
-using Client;
+using Api.Client;
 using Xunit.Abstractions;
 
 public class MessagePackFormatterTests : FormattersTests

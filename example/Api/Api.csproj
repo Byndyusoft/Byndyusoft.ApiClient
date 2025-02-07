@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
-		<RootNamespace>Byndyusoft.ApiClient.Example.Server</RootNamespace>
+		<RootNamespace>Api</RootNamespace>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Api.Contracts\Byndyusoft.ApiClient.Example.Contracts.csproj" />
+		<ProjectReference Include="..\Api.Contracts\Api.Contracts.csproj" />
 	</ItemGroup>
 
 </Project>

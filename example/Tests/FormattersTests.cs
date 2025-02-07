@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Client;
+using Api.Client;
 using Models;
 using Xunit;
 using Xunit.Abstractions;

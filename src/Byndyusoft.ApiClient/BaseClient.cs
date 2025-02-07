@@ -1,44 +1,48 @@
-﻿namespace Byndyusoft.ApiClient
+namespace Byndyusoft.ApiClient
 {
     using System;
     using System.Net.Http;
+    using System.Net.Http.Formatting;
+    using System.Net.Http.Headers;
+    using System.Net.Http.Json;
+    using System.Net.Http.Json.Formatting;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Options;
 
     public class BaseClient
     {
-        protected readonly ApiClientSettings ApiSettings;
+        protected readonly MediaTypeFormatter Formatter;
         protected readonly HttpClient Client;
+        protected readonly ApiClientSettings ApiSettings;
 
-        protected BaseClient(HttpClient client, IOptions<ApiClientSettings> apiSettings)
+        protected BaseClient(
+            HttpClient client,
+            IOptions<ApiClientSettings> apiSettings,
+            MediaTypeFormatter? formatter = null
+        )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
             ApiSettings = apiSettings.Value ?? throw new ArgumentNullException(nameof(apiSettings));
-        }
-
-        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken)
-        {
-            var response = await Client.GetAsync(GetAbsoluteUrl(url), cancellationToken).ConfigureAwait(false);
+            Formatter = formatter ?? new JsonMediaTypeFormatter(JsonDefaults.SerializerOptions);
             
-            await EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            foreach (var mediaTypeHeaderValue in Formatter.SupportedMediaTypes)
+                Client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue(mediaTypeHeaderValue.MediaType)
+                );
         }
+        
+        protected async Task<TResult> GetAsync<TResult>(string url, CancellationToken cancellationToken) =>
+            await CallAsync<TResult>(HttpMethod.Get, url, null, cancellationToken);
 
-        protected async Task<TResult> GetAsync<TParams, TResult>(string url, CancellationToken cancellationToken, TParams? dto = null)
+        protected async Task<TResult> GetAsync<TParams, TResult>(string url, TParams? parameters, CancellationToken cancellationToken)
             where TParams : class
         {
-            var endpoint = GetAbsoluteUrl(url);
-            var httpQuery = dto != null
-                ? $"{endpoint}?{HttpGetParamsBuilder.Build(dto)}"
-                : endpoint;
-
-            var response = await Client.GetAsync(httpQuery, cancellationToken).ConfigureAwait(false);
-
-            await EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
+            var httpQuery = parameters != null
+                ? $"{url}?{HttpGetParamsBuilder.Build(parameters)}"
+                : url;
+            var result = await CallAsync<TResult>(HttpMethod.Get, httpQuery, null, cancellationToken).ConfigureAwait(false);
+            return result;
         }
 
         protected Task PostAsync(string url, object content, CancellationToken cancellationToken) =>
@@ -50,64 +54,67 @@
         protected Task<TResult> PutAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
             CallAsync<TResult>(HttpMethod.Put, url, content, cancellationToken);
 
+        protected Task PutAsync(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync(HttpMethod.Put, url, content, cancellationToken);
+
+        protected Task<TResult> PatchAsync<TResult>(string url, object content, CancellationToken cancellationToken) =>
+            CallAsync<TResult>(new HttpMethod("PATCH"), url, content, cancellationToken);
+
         protected Task PatchAsync(string url, object content, CancellationToken cancellationToken) =>
             CallAsync(new HttpMethod("PATCH"), url, content, cancellationToken);
 
         protected Task DeleteAsync(string url, CancellationToken cancellationToken) =>
             CallAsync(HttpMethod.Delete, url, null, cancellationToken);
 
-        protected Task DeleteAsync<TParams>(string url, TParams parameters, CancellationToken cancellationToken) =>
-            CallAsync(HttpMethod.Delete, url, parameters, cancellationToken);
-
-        protected string GetAbsoluteUrl(string url)
+        protected async Task DeleteAsync<TParams>(string url, TParams? parameters, CancellationToken cancellationToken)
+            where TParams : class
         {
-            return $"{ApiSettings.ConnectionString}{url}";
+            var httpQuery = parameters != null
+                ? $"{url}?{HttpGetParamsBuilder.Build(parameters)}"
+                : url;
+            await CallAsync(HttpMethod.Delete, httpQuery, null, cancellationToken).ConfigureAwait(false);
         }
+
+        protected string GetAbsoluteUrl(string url) => $"{ApiSettings.ConnectionString}{url}";
 
         protected async Task<TResult> CallAsync<TResult>(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
         {
+            var response = await CallAsyncBase(method, url, content, cancellationToken).ConfigureAwait(false);
+            
+            var result = await response
+                .Content
+                .ReadAsAsync<TResult>(
+                    new[] { Formatter },
+                    cancellationToken
+                )
+                .ConfigureAwait(false);
+            return result;
+        }
+
+        protected Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken) =>
+            CallAsyncBase(method, url, content, cancellationToken);
+
+        private async Task<HttpResponseMessage> CallAsyncBase(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
+        {
+            var absoluteUrl = GetAbsoluteUrl(url);
+            var absoluteUri = new Uri(absoluteUrl, UriKind.RelativeOrAbsolute);
             var requestMessage
                 = new HttpRequestMessage
                   {
                       Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
+                      RequestUri = absoluteUri,
                   };
+            if (content != null)
+            {
+                var type = content.GetType();
+                var objContent = new ObjectContent(type, content, Formatter);
+                requestMessage.Content = objContent;
+            }
 
             var response = await Client.SendAsync(requestMessage, cancellationToken);
 
-            await EnsureSuccessStatusCode(response);
-
-            return await response.Content.ReadAsJsonAsync<TResult>();
-        }
-
-        protected async Task CallAsync(HttpMethod method, string url, object? content, CancellationToken cancellationToken)
-        {
-            var requestMessage
-                = new HttpRequestMessage
-                  {
-                      Method = method,
-                      RequestUri = new Uri(GetAbsoluteUrl(url), UriKind.RelativeOrAbsolute),
-                      Content = HttpContentExtensions.PrepareHttpContent(content)
-                  };
-
-            var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
-
-            await EnsureSuccessStatusCode(response);
-        }
-
-        protected async Task EnsureSuccessStatusCode(HttpResponseMessage response)
-        {
-            if (response.IsSuccessStatusCode == false)
-            {
-                var stringContent = await response.Content.ReadAsStringAsync();
-                response.Content.Dispose();
-
-                throw new HttpRequestWithContentException(
-                    message: $"Error occurred on sending a request. Status code: {(int)response.StatusCode} - {response.StatusCode.ToString()}. Message: {response.ReasonPhrase}",
-                    statusCode: response.StatusCode,
-                    content: stringContent);
-            }
+            response.EnsureSuccessStatusCode();
+            return response;
         }
     }
 }

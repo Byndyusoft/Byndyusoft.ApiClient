@@ -16,8 +16,7 @@ public class PersonApi : BaseClient, IPersonApi
             HttpClient client,
             IOptions<ApiClientSettings> apiSettings,
             MediaTypeFormatter? formatter = null
-        )
-        : base(client, apiSettings, formatter) { }
+        ) : base(client, apiSettings, formatter) { }
 
     public Task AddListAsync(int id, CancellationToken cancellationToken)
         => PostAsync($"/{PersonModelListRoutes.PersonModelListPrefix}/{PersonModelListRoutes.AddListCmd}/{id}", null, cancellationToken);

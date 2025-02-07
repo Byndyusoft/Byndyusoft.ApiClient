@@ -22,7 +22,7 @@
                 .Configure<ApiClientSettings>(settingsSection);
 
             services.AddHttpClient<IPersonApi, PersonApi>(
-                client=>
+                client =>
                     new PersonApi(
                         client,
                         Options.Create<ApiClientSettings>(settings),

@@ -12,9 +12,9 @@
         /// <summary>
         ///     AddSwagger
         /// </summary>
-        public static IServiceCollection AddSwagger(this IServiceCollection services) =>
-                services
-                    .AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>()
-                    .AddSwaggerGen();
+        public static IServiceCollection AddSwagger(this IServiceCollection services)
+            => services
+                .AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>()
+                .AddSwaggerGen();
     }
 }

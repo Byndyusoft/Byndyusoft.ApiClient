@@ -7,18 +7,22 @@
     {
         public static IServiceCollection AddVersioning(this IServiceCollection services)
         {
-            return services.AddApiVersioning(options =>
-                {
-                    options.ReportApiVersions = true;
-                    options.DefaultApiVersion = ApiVersion.Default;
-                    options.AssumeDefaultVersionWhenUnspecified = true;
-                })
+            return services.AddApiVersioning(
+                    options =>
+                    {
+                        options.ReportApiVersions = true;
+                        options.DefaultApiVersion = ApiVersion.Default;
+                        options.AssumeDefaultVersionWhenUnspecified = true;
+                    }
+                )
                 .AddMvc()
-                .AddApiExplorer(options =>
-                {
-                    options.GroupNameFormat = "'v'VVV";
-                    options.SubstituteApiVersionInUrl = true;
-                })
+                .AddApiExplorer(
+                    options =>
+                    {
+                        options.GroupNameFormat = "'v'VVV";
+                        options.SubstituteApiVersionInUrl = true;
+                    }
+                )
                 .Services;
         }
     }

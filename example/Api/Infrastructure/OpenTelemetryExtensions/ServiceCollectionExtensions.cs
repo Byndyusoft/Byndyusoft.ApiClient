@@ -15,7 +15,8 @@ public static class ServiceCollectionExtensions
         string? serviceName,
         Action<OtlpExporterOptions> configureOtlp,
         Action<TracerProviderBuilder>? configureBuilder = null,
-        Action<MeterProviderBuilder>? configureMeter = null)
+        Action<MeterProviderBuilder>? configureMeter = null
+    )
     {
         services
             .AddOpenTelemetry()

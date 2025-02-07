@@ -11,9 +11,6 @@ public class JsonFormatterTests : FormattersTests
         ITestOutputHelper testOutputHelper
     ) : base(factory, testOutputHelper)
     {
-        TestSubject = new PersonApi(
-            Client,
-            _clientSettings
-        );
+        TestSubject = new PersonApi(Client, _clientSettings);
     }
 }

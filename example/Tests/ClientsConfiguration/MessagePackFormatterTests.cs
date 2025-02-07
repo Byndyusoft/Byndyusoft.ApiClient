@@ -1,13 +1,18 @@
-namespace Byndyusoft.ApiClient.Example.Tests;
+namespace Tests.ClientsConfiguration;
 
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
 using Api.Client;
+using Tests;
+using Infrastructure;
 using Xunit.Abstractions;
 
 public class MessagePackFormatterTests : FormattersTests
 {
-    public MessagePackFormatterTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    public MessagePackFormatterTests(
+        CustomWebApplicationFactory<Program> factory,
+        ITestOutputHelper testOutputHelper
+    ) : base(factory, testOutputHelper)
     {
         TestSubject = new PersonApi(
             Client,

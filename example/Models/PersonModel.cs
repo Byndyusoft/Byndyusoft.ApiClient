@@ -79,7 +79,12 @@ public class PersonModel
 
     private bool Equals(PersonModel other)
     {
-        var childrenEqual = ChildrenNames?.SequenceEqual(other.ChildrenNames) ?? other.ChildrenNames == null;
+        bool childrenEqual;
+        if (ChildrenNames==null && other.ChildrenNames==null) childrenEqual = true;
+        else if (ChildrenNames != null && other.ChildrenNames != null)
+            childrenEqual = ChildrenNames.SequenceEqual(other.ChildrenNames);
+        else childrenEqual = false;
+        
         return
             String.Equals(FirstName, other.FirstName, StringComparison.InvariantCulture) &&
             String.Equals(LastName, other.LastName, StringComparison.InvariantCulture) &&

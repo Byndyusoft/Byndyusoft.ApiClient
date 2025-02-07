@@ -1,18 +1,16 @@
 #nullable enable
-namespace Byndyusoft.ApiClient.Example.Tests;
+namespace Tests;
 
-using System;
 using System.Net.Http;
-using Api;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Hosting;
+using Byndyusoft.ApiClient;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Options;
+using Infrastructure;
 
-public abstract class MvcTestFixture : IDisposable
+public abstract class MvcTestFixture
 {
-    private HttpClient? _client;
-    protected IHost? _host;
+    private readonly HttpClient _client;
+    private readonly CustomWebApplicationFactory<Program> _factory;
     protected IOptions<ApiClientSettings> _clientSettings = new OptionsWrapper<ApiClientSettings>(
         new ApiClientSettings
         {
@@ -20,40 +18,16 @@ public abstract class MvcTestFixture : IDisposable
         }
     );
 
-    protected MvcTestFixture()
+    protected MvcTestFixture(CustomWebApplicationFactory<Program> factory)
     {
-        _host = Host
-            .CreateDefaultBuilder()
-            .ConfigureWebHostDefaults(
-                webBuilder =>
-                {
-                    webBuilder.UseTestServer();
-                    webBuilder.UseStartup<Startup>();
-                }
-            )
-            .Build();
-        _host.Start();
+        _factory = factory;
+        _client = factory.CreateClient(
+            new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            }
+        );
     }
 
-    protected HttpClient Client
-    {
-        get
-        {
-            if (_client == null)
-                _client = _host!.GetTestClient();
-            
-            return _client;
-        }
-    }
-
-    public virtual void Dispose()
-    {
-        _host?.Dispose();
-        _host = null;
-
-        _client?.Dispose();
-        _client = null;
-
-        GC.SuppressFinalize(this);
-    }
+    protected HttpClient Client => _client;
 }

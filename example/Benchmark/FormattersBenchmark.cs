@@ -19,7 +19,7 @@ using Microsoft.Extensions.Options;
 [AllStatisticsColumn]
 public class FormattersBenchmark : MvcTestFixture
 {
-    protected PersonApi TestSubject;
+    private PersonApi TestSubject;
     private static int _idProvider = 0;
     
     [GlobalSetup]

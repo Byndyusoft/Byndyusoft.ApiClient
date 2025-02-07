@@ -1,4 +1,4 @@
-namespace Byndyusoft.ApiClient.Example.Tests;
+namespace Tests;
 
 using System.Collections.Generic;
 using System.Net.Http;
@@ -6,10 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Api.Client;
 using Models;
+using Infrastructure;
 using Xunit;
 using Xunit.Abstractions;
 
-public abstract class FormattersTests(ITestOutputHelper testOutputHelper) : MvcTestFixture
+public abstract class FormattersTests(
+    CustomWebApplicationFactory<Program> factory,
+    ITestOutputHelper testOutputHelper
+) : MvcTestFixture(factory), IClassFixture<CustomWebApplicationFactory<Program>>
 {
     protected PersonApi TestSubject;
     private static int _idProvider = 0;

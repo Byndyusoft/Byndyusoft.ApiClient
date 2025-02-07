@@ -1,41 +1,61 @@
-namespace Api;
-
+using System.Net.Http.ProtoBuf;
+using Api.Infrastructure.OpenTelemetryExtensions;
+using Api.Infrastructure.Swagger;
+using Api.Infrastructure.Versioning;
 using Byndyusoft.Logging.Builders;
 using Byndyusoft.Logging.Configuration;
-using Infrastructure.OpenTelemetryExtensions;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Serilog;
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        CreateHostBuilder(args)
-            .Build()
-            .Run();
-    }
+var serviceName = typeof(Program).Assembly.GetName().Name;
+var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog(
+    (context, configuration) =>
+        configuration
+            .UseDefaultSettings(context.Configuration)
+            .UseOpenTelemetryTraces()
+            .WriteToOpenTelemetry(activityEventBuilder: StructuredActivityEventBuilder.Instance)
+);
 
-    private static IHostBuilder CreateHostBuilder(string[] args)
-    {
-        var serviceName = typeof(Program).Assembly.GetName().Name!;
-        return Host.CreateDefaultBuilder(args)
-            .UseSerilog(
-                (context, configuration) => configuration
-                    .UseDefaultSettings(context.Configuration)
-                    .UseOpenTelemetryTraces()
-                    .WriteToOpenTelemetry(activityEventBuilder: StructuredActivityEventBuilder.Instance)
-            )
-            .ConfigureServices(
-                (context, services) =>
-                    services.AddOpenTelemetry(
-                        serviceName,
-                        context.Configuration.GetSection("OtlpExporterOptions").Bind,
-                        builder => builder.AddNpgsql()
-                    )
-            )
-            .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
-    }
+var services = builder.Services;
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
+services.AddOpenTelemetry(
+    serviceName,
+    builder.Configuration.GetSection("OtlpExporterOptions").Bind,
+    builder => builder.AddNpgsql()
+);
+services
+    .AddMvcCore()
+    .AddProtoBufNet(options => { options.Model = ProtoBufDefaults.TypeModel; })
+    .AddMessagePackFormatters()
+    .AddFormatterMappings()
+    .AddTracing();
+services
+    .AddRouting(options => options.LowercaseUrls = true);
+services.AddHealthChecks();
+services
+    .AddVersioning()
+    .AddSwagger();
+
+var app = builder.Build();
+app
+    .UseHealthChecks("/healthz")
+    .UseOpenTelemetryPrometheusScrapingEndpoint()
+    .UseRouting()
+    .UseEndpoints(endpoints => endpoints.MapControllers());
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.Run();
+
+// For tests accessibility
+public partial class Program { }

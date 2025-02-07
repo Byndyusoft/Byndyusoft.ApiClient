@@ -3,8 +3,8 @@ namespace Benchmark;
 
 using System;
 using System.Net.Http;
-using Api;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,41 +12,31 @@ using Microsoft.Extensions.Logging;
 public abstract class MvcTestFixture : IDisposable
 {
     private HttpClient? _client;
-    protected IHost? _host;
 
     protected MvcTestFixture()
     {
-        _host = Host.CreateDefaultBuilder()
-                .ConfigureWebHostDefaults(
-                    webBuilder =>
-                    {
-                        webBuilder.UseTestServer();
-                        webBuilder.UseStartup<Startup>();
-                        webBuilder.ConfigureLogging(loggingConfig => loggingConfig.ClearProviders());
-                    }
-                )
-                .Build();
-        _host.Start();
-    }
-
-    protected HttpClient Client
-    {
-        get
-        {
-            if (_client == null)
+        var factory = new WebApplicationFactory<Program>();
+        factory.WithWebHostBuilder(
+            builder =>
             {
-                _client = _host.GetTestClient();
+                builder.UseTestServer();
+                builder.ConfigureLogging(loggingConfig => loggingConfig.ClearProviders());
+                builder.UseEnvironment("Development");
+                builder.UseContentRoot("http://localhost:5000");
             }
-
-            return _client;
-        }
+        );
+        _client = factory.CreateClient(
+            new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            }
+        );
     }
+
+    protected HttpClient Client => _client;
 
     public virtual void Dispose()
     {
-        _host?.Dispose();
-        _host = null;
-
         _client?.Dispose();
         _client = null;
 

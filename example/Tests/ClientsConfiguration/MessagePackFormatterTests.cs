@@ -2,6 +2,7 @@ namespace Tests.ClientsConfiguration;
 
 using System.Net.Http.MessagePack;
 using System.Net.Http.MessagePack.Formatting;
+using Api;
 using Api.Client;
 using Tests;
 using Infrastructure;

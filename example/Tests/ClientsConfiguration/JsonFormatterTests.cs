@@ -1,5 +1,6 @@
 namespace Tests.ClientsConfiguration;
 
+using Api;
 using Api.Client;
 using Infrastructure;
 using Xunit.Abstractions;

@@ -3,10 +3,10 @@ namespace Benchmark;
 
 using System;
 using System.Net.Http;
+using Api.Contracts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 public abstract class MvcTestFixture : IDisposable
@@ -15,21 +15,21 @@ public abstract class MvcTestFixture : IDisposable
 
     protected MvcTestFixture()
     {
-        var factory = new WebApplicationFactory<Program>();
-        factory.WithWebHostBuilder(
-            builder =>
-            {
-                builder.UseTestServer();
-                builder.ConfigureLogging(loggingConfig => loggingConfig.ClearProviders());
-                builder.UseEnvironment("Development");
-                builder.UseContentRoot("http://localhost:5000");
-            }
-        );
-        _client = factory.CreateClient(
-            new WebApplicationFactoryClientOptions
-            {
-                AllowAutoRedirect = false
-            }
+        var factory = new WebApplicationFactory<Api.Program>();
+        _client = factory
+            .WithWebHostBuilder(
+                builder =>
+                {
+                    builder.UseTestServer();
+                    builder.ConfigureLogging(loggingConfig => loggingConfig.ClearProviders());
+                    builder.UseEnvironment(BenchmarkEnvironment.Name);
+                }
+            )
+            .CreateClient(
+                new WebApplicationFactoryClientOptions
+                          {
+                              AllowAutoRedirect = false
+                          }
         );
     }
 

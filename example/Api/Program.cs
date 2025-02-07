@@ -1,4 +1,5 @@
 using System.Net.Http.ProtoBuf;
+using Api.Contracts;
 using Api.Infrastructure.OpenTelemetryExtensions;
 using Api.Infrastructure.Swagger;
 using Api.Infrastructure.Versioning;
@@ -13,13 +14,14 @@ using Serilog;
 
 var serviceName = typeof(Program).Assembly.GetName().Name;
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseSerilog(
-    (context, configuration) =>
-        configuration
-            .UseDefaultSettings(context.Configuration)
-            .UseOpenTelemetryTraces()
-            .WriteToOpenTelemetry(activityEventBuilder: StructuredActivityEventBuilder.Instance)
-);
+if (builder.Environment.EnvironmentName != BenchmarkEnvironment.Name)
+    builder.Host.UseSerilog(
+        (context, configuration) =>
+            configuration
+                .UseDefaultSettings(context.Configuration)
+                .UseOpenTelemetryTraces()
+                .WriteToOpenTelemetry(activityEventBuilder: StructuredActivityEventBuilder.Instance)
+    );
 
 var services = builder.Services;
 services.AddEndpointsApiExplorer();
@@ -58,4 +60,7 @@ if (app.Environment.IsDevelopment())
 app.Run();
 
 // For tests accessibility
-public partial class Program { }
+namespace Api
+{
+    public partial class Program { } 
+}

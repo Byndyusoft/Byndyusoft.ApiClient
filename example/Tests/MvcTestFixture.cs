@@ -2,6 +2,7 @@
 namespace Tests;
 
 using System.Net.Http;
+using Api;
 using Byndyusoft.ApiClient;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Options;

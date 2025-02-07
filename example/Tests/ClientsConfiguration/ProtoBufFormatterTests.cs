@@ -2,6 +2,7 @@ namespace Tests.ClientsConfiguration;
 
 using System.Net.Http.ProtoBuf;
 using System.Net.Http.ProtoBuf.Formatting;
+using Api;
 using Api.Client;
 using Tests;
 using Infrastructure;
